@@ -1,5 +1,17 @@
 # enclosure.io
 
+## Deployment Guide
+
+### Dependencies:
+- NodeJS 6.x
+- NPM
+
+### Install Packages & Run:
+- `npm install` to install required packages (root privilege may be required)
+- `npm start` to start the server & listening on port 3000
+
+## Documentation
+
 Members: Hailiang Xu (hailianx), Chunan Zeng (chunanz), Leiyu Zhao (leiyuz)
 
 ### Description
@@ -26,16 +38,16 @@ We want to extend the original game with features we like:
 
 ### Technical Stack
 
-- Frontend: 
+- Frontend:
   - jQuery + H5: convinient yet powerful frontend technologies
 
 
-- Backend: 
+- Backend:
   - Node.js + express.io: lightweight, shared memory model, easy to implement
   - nginx: reliable listener for port 80
 
 
-- Frontend-backend communication: 
+- Frontend-backend communication:
   - Websocket: full duplex communication
-- Database: 
+- Database:
   - MongoDB: NoSQL, easy to store unstructured data, like map information.
