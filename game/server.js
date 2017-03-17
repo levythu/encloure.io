@@ -16,7 +16,11 @@ function NewServer() {
         tConf.profile=client.profile;
         tConf.timestamp=(new Date()).getTime();
 
-        client.ws.send(JSON.stringify(tConf));
+        try {
+            client.ws.send(JSON.stringify(tConf));
+        } catch (e) {
+            // TODO remove the dead socket
+        }
     }
     server.onMessage=function(client, message) {
         var obj;
@@ -57,7 +61,11 @@ function NewServer() {
     // obj is a js-object
     server.Broadcast=function(obj) {
         for (i in clients) {
-            clients[i].ws.send(JSON.stringify(obj));
+            try {
+                clients[i].ws.send(JSON.stringify(obj));
+            } catch (e) {
+                // TODO remove the dead socket
+            }
         }
     }
 
