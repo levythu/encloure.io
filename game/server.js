@@ -42,8 +42,8 @@ function NewServer() {
                 id: thisCount,
             },
         };
+        server.onConnect(client);
         clients[thisCount]=client;
-
         ws.on("message", function(msg) {
             console.log(msg);
             server.onMessage(client, msg);
@@ -53,7 +53,6 @@ function NewServer() {
             server.onDisconnect(client);
             delete clients[thisCount];
         });
-        server.onConnect(client);
     });
     // obj is a js-object
     server.Broadcast=function(obj) {
@@ -62,6 +61,7 @@ function NewServer() {
         }
     }
 
+    g.Start();
     return "ws://"+conf.server.hostname+":2333";
 }
 

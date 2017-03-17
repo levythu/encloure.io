@@ -1,12 +1,12 @@
 var globalConf;
 
+var N={};
+
 // Events triggered:
 //      - gm-init: The game is inited and all the parameters are stored in globalConf;
 
 $(function(){
-    var endpointURL=new URL("/live", window.location.href);
-    endpointURL.protocol="ws:";
-    var connection = new WebSocket(endpointURL.href);
+    var connection = new WebSocket("ws://aws.levy.at:2333/");
     var hasInitiated=false;
 
     function onError() {
@@ -25,7 +25,7 @@ $(function(){
     connection.onmessage = function(e) {
         var res;
         try {
-            res=JSON.parse(e);
+            res=JSON.parse(e.data);
         } catch (err) {
             onError();
             return;
@@ -34,7 +34,12 @@ $(function(){
             hasInitiated=true;
             globalConf=res;
             $("body").trigger("gm-init");
+        } else {
+            $("body").trigger("gm-msg", [res]);
         }
-        console.log(res);
+    };
+
+    N.send=function(obj) {
+        connection.send(JSON.stringify(obj));
     };
 });
