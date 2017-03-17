@@ -9,7 +9,6 @@ var index = require('./routes/index');
 var live = require('./routes/live');
 
 var app = express();
-var expressWs = require('express-ws')(app);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -24,7 +23,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.ws('/live', live);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
