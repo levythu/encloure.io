@@ -12,6 +12,10 @@ function NewGame(server) {
     var game={};
     var player={};
 
+    var startPoint;
+    var nextPoint;
+    var interval=1000/conf.game.RPS
+
     game.position={};
     // id is a string and playerProfile is its profile to be initialized
     game.JoinNewPlayer=function(id, playerProfile) {
@@ -26,15 +30,25 @@ function NewGame(server) {
             player[id].d=CONTROL_DIR[obj.dir];
         }
     }
+    game.onTick=function() {
+        for (i in player) {
+            var prof=player[i];
+            prof.x=(prof.x+prof.d[0]+conf.game.MapSize[0])%conf.game.MapSize[0];
+            prof.y=(prof.y+prof.d[1]+conf.game.MapSize[1])%conf.game.MapSize[1];
+        }
+        server.Broadcast(player);
+        nextPoint+=interval;
+        var nowPoint=(new Date()).getTime();
+        while (nextPoint<nowPoint) {
+            console.warn("CPU cannot catch up with refreshing rate, consider lowering your RPS...");
+            nextPoint+=interval;
+        }
+        setTimeout(game.onTick, nextPoint-nowPoint);
+    }
     game.Start=function() {
-        setInterval(function() {
-            for (i in player) {
-                var prof=player[i];
-                prof.x=(prof.x+prof.d[0]+conf.game.MapSize[0])%conf.game.MapSize[0];
-                prof.y=(prof.y+prof.d[1]+conf.game.MapSize[1])%conf.game.MapSize[1];
-            }
-            server.Broadcast(player);
-        }, 1000/conf.game.RPS);
+        startPoint=(new Date()).getTime();
+        nextPoint=startPoint+interval;
+        setTimeout(game.onTick, nextPoint-startPoint);
     };
 
     return game;

@@ -2,20 +2,24 @@ $(function(){
     var mainCanvas=$("#mainCanvas")[0].getContext("2d");
     var WIDTH, HEIGHT;
     var players={};
+    var localPlayers={};
 
     function renderFrame() {
         mainCanvas.save();
         mainCanvas.clearRect(0,0,WIDTH,HEIGHT);
-        for (var i in players) {
-            var player=players[i];
+        for (var i in localPlayers) {
+            var player=localPlayers[i];
             if (i===globalConf.profile.id) {
                 mainCanvas.fillStyle="rgb(255, 0, 0)";
             } else {
                 mainCanvas.fillStyle="rgb(0, 0, 0)";
             }
             mainCanvas.fillRect(player.x*10, player.y*10, 10, 10);
-            player.x+=player.d[0]*globalConf.RPS/globalConf.FPS;
-            player.y+=player.d[1]*globalConf.RPS/globalConf.FPS;
+        }
+        for (var i in localPlayers) {
+            var player=localPlayers[i];
+            player.x+=player.spf[0];
+            player.y+=player.spf[1];
         }
         mainCanvas.restore();
     }
@@ -30,6 +34,18 @@ $(function(){
 
     $("body").on("gm-msg", function(e, obj) {
         players=obj;
+        for (var i in players) {
+            if (!(i in localPlayers)) {
+                localPlayers[i]={
+                    x: players[i].x,
+                    y: players[i].y,
+                    spf: [0, 0],
+                };
+            } else {
+                localPlayers[i].spf[0]=(players[i].x-localPlayers[i].x)*globalConf.RPS/globalConf.FPS;
+                localPlayers[i].spf[1]=(players[i].y-localPlayers[i].y)*globalConf.RPS/globalConf.FPS;
+            }
+        }
     });
 
 
