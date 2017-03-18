@@ -2,22 +2,38 @@ $(function(){
     var mainCanvas=$("#mainCanvas")[0].getContext("2d");
     var WIDTH, HEIGHT;
     var players={};
-    var localPlayers={};
+    var moves=[];
 
     function renderFrame() {
         mainCanvas.save();
         mainCanvas.clearRect(0,0,WIDTH,HEIGHT);
-        for (var i in localPlayers) {
-            var player=localPlayers[i];
-            mainCanvas.fillStyle=players[i].color;
+        if (moves.length>1) {
+            // TODO handle all the hops
+            for (var i in moves[moves.length-2]) {
+                if (!(i in players)) continue;
+                players[i].x=moves[moves.length-2][i].x;
+                players[i].y=moves[moves.length-2][i].y;
+            }
+            moves=[moves[moves.length-1]];
+        }
+        for (var i in players) {
+            var player=players[i];
+            mainCanvas.fillStyle=player.color;
             mainCanvas.fillRect(player.x*10, player.y*10, 10, 10);
         }
-        for (var i in localPlayers) {
-            var player=localPlayers[i];
-            player.x+=player.spf[0];
-            player.y+=player.spf[1];
-        }
         mainCanvas.restore();
+        if (moves.length>0) {
+            for (var i in moves[0]) {
+                var player=players[i];
+                if (player==null) continue;
+                if (!("sx" in moves[0][i])) {
+                    moves[0][i].sx=(moves[0][i].x-player.x)*globalConf.RPS/globalConf.FPS;
+                    moves[0][i].sy=(moves[0][i].y-player.y)*globalConf.RPS/globalConf.FPS;
+                }
+                player.x+=moves[0][i].sx;
+                player.y+=moves[0][i].sy;
+            }
+        }
     }
 
     $("body").on("gm-init", function() {
@@ -29,18 +45,13 @@ $(function(){
     });
 
     $("body").on("gm-msg", function(e, obj) {
-        players=obj;
-        for (var i in players) {
-            if (!(i in localPlayers)) {
-                localPlayers[i]={
-                    x: players[i].x,
-                    y: players[i].y,
-                    spf: [0, 0],
-                };
-            } else {
-                localPlayers[i].spf[0]=(players[i].x-localPlayers[i].x)*globalConf.RPS/globalConf.FPS;
-                localPlayers[i].spf[1]=(players[i].y-localPlayers[i].y)*globalConf.RPS/globalConf.FPS;
+        if ("join" in obj) {
+            for (var i in obj.join) {
+                players[i]=obj.join[i];
             }
+        }
+        if ("move" in obj) {
+            moves.push(obj.move);
         }
     });
 

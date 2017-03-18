@@ -20,6 +20,23 @@ var PALLET=[
     "#607D8B",
 ];
 
+// # Server to Client communication:
+//  - The first packet must be game info
+//  - From the 2nd one, it follows the rule:
+//
+// {
+//     join: {
+//         "someUserId": {id: "someUserId", x: 123, y: 456, d:[dx, dy], color: "#00beef"},
+//         ...
+//     },
+//
+//     // move will only be presented once within one tick
+//     move: {
+//         "someUserId": {x: newX, y: newY},
+//         ...
+//     }
+// }
+
 // server is a server object from server.js
 function NewGame(server) {
     var game={};
@@ -42,6 +59,15 @@ function NewGame(server) {
         playerProfile.d=CONTROL_DIR.r;
         playerProfile.color=PALLET[colorChoosen];
         colorChoosen=(colorChoosen+1)%PALLET.length;
+
+        var newJoin={};
+        newJoin[id]=playerProfile;
+        server.Broadcast({
+            join: newJoin,
+        });
+        server.Send(id, {
+            join: player,
+        });
     };
     // id is a string and obj is a js-object
     game.onControl=function(id, obj) {
@@ -50,12 +76,24 @@ function NewGame(server) {
         }
     }
     game.onTick=function() {
+        var newMove={};
         for (i in player) {
             var prof=player[i];
-            prof.x=(prof.x+prof.d[0]+conf.game.MapSize[0])%conf.game.MapSize[0];
-            prof.y=(prof.y+prof.d[1]+conf.game.MapSize[1])%conf.game.MapSize[1];
+            prof.x=prof.x+prof.d[0];
+            if (prof.x<0) prof.x=0;
+            else if (prof.x>=conf.game.MapSize[0]) prof.x=conf.game.MapSize[0]-1;
+            prof.y=prof.y+prof.d[1];
+            if (prof.y<0) prof.y=0;
+            else if (prof.y>=conf.game.MapSize[1]) prof.y=conf.game.MapSize[1]-1;
+            newMove[i]={
+                x: prof.x,
+                y: prof.y,
+            };
         }
-        server.Broadcast(player);
+        server.Broadcast({
+            move: newMove,
+        });
+
         nextPoint+=interval;
         var nowPoint=(new Date()).getTime();
         while (nextPoint<nowPoint) {

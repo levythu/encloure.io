@@ -18,6 +18,11 @@ function NewServer() {
 
         try {
             client.ws.send(JSON.stringify(tConf));
+            for (var i=0; i<client.msgPend.length; i++) {
+                client.ws.send(JSON.stringify(client.msgPend[i]));
+            }
+            client.msgPend=[];
+            client.ready=true;
         } catch (e) {
             // TODO remove the dead socket
         }
@@ -42,11 +47,12 @@ function NewServer() {
 
         var client={
             ws: ws,
+            ready:   false,
+            msgPend: [],
             profile: {
                 id: thisCount,
             },
         };
-        server.onConnect(client);
         clients[thisCount]=client;
         ws.on("message", function(msg) {
             console.log(msg);
@@ -57,15 +63,32 @@ function NewServer() {
             server.onDisconnect(client);
             delete clients[thisCount];
         });
+        server.onConnect(client);
     });
     // obj is a js-object
     server.Broadcast=function(obj) {
         for (i in clients) {
             try {
-                clients[i].ws.send(JSON.stringify(obj));
+                if (clients[i].ready)
+                    clients[i].ws.send(JSON.stringify(obj));
+                else
+                    clients[i].msgPend.push(obj);
             } catch (e) {
                 // TODO remove the dead socket
             }
+        }
+    }
+    // obj is a js-object
+    server.Send=function(id, obj) {
+        var c=clients[id];
+        if (c==null) return;
+        try {
+            if (c.ready)
+                c.ws.send(JSON.stringify(obj));
+            else
+                c.msgPend.push(obj);
+        } catch (e) {
+            // TODO remove the dead socket
         }
     }
 
