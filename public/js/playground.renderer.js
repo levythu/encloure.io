@@ -9,11 +9,7 @@ $(function(){
         mainCanvas.clearRect(0,0,WIDTH,HEIGHT);
         for (var i in localPlayers) {
             var player=localPlayers[i];
-            if (i===globalConf.profile.id) {
-                mainCanvas.fillStyle="rgb(255, 0, 0)";
-            } else {
-                mainCanvas.fillStyle="rgb(0, 0, 0)";
-            }
+            mainCanvas.fillStyle=players[i].color;
             mainCanvas.fillRect(player.x*10, player.y*10, 10, 10);
         }
         for (var i in localPlayers) {
