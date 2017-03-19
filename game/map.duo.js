@@ -17,6 +17,7 @@
 
         // initiate map
         map.c=[];
+        map._b=blanks;
         for (var i=0; i<width; i++) {
             var t=[];
             for (var j=0; j<height; j++) {
@@ -54,7 +55,7 @@
         // FloodFill
         var cros=[[1, 0], [-1, 0], [0, 1], [0, -1]];
         var diag=[[1, 1], [-1, 1], [1, -1], [-1, -1]];
-        map.FloodFill=function() {
+        map.FloodFill=function(triggeredIdNumList={}) {
             var round=map.NOT_DECIDED;
             var record={};
             while (true) {
@@ -104,9 +105,12 @@
             for (var i=0; i<width; i++) {
                 for (var j=0; j<height; j++) {
                     if (map.c[i][j]>=0) {
-                        map.c[i][j]=map.c[i][j]%map.DIM_GAP;
+                        var numid=map.c[i][j]%map.DIM_GAP;
+                        if (numid in triggeredIdNumList) map.c[i][j]=numid;
                     } else {
-                        map.Set(i, j, record[map.c[i][j]]);
+                        var numid=record[map.c[i][j]];
+                        if (numid in triggeredIdNumList) map.Set(i, j, numid);
+                        else map.Set(i, j, map.NO_OCCUPATION);
                     }
                 }
             }
