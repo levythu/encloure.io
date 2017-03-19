@@ -7,5 +7,9 @@
 }
 
 #mainCanvas {
-    background-color: #dedede;
+    background-color: transparent;
+}
+
+#persistCanvas {
+    background-color: #444;
 }

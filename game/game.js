@@ -1,4 +1,5 @@
 var conf=require("../settings");
+var map=require("./map.duo");
 
 var CONTROL_DIR={
     "u":    [0, -1],
@@ -6,19 +7,7 @@ var CONTROL_DIR={
     "l":    [-1, 0],
     "r":    [1 , 0],
 }
-var PALLET=[
-    "#E53935",
-    "#D81B60",
-    "#8E24AA",
-    "#3F51B5",
-    "#2196F3",
-    "#009688",
-    "#4CAF50",
-    "#FFC107",
-    "#FB8C00",
-    "#FF5722",
-    "#607D8B",
-];
+var PALLET=conf.PALLET;
 
 // # Server to Client communication:
 //  - The first packet must be game info
@@ -51,6 +40,7 @@ function NewGame(server) {
     var colorChoosen=0;
 
     game.position={};
+    game.map=map(conf.game.MapSize[0], conf.game.MapSize[1]);
     // id is a string and playerProfile is its profile to be initialized
     game.JoinNewPlayer=function(id, playerProfile) {
         player[id]=playerProfile;
