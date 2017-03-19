@@ -6,6 +6,7 @@ $(function(){
     var persistCanvas=$("#persistCanvas")[0].getContext("2d");
     var CANVAS_WIDTH, CANVAS_HEIGHT;      // in pixel!
     var players={};
+    // `moves` is a stack, recording all the pending moves from the last render point (decided by FPS)
     var moves=[];
     var map;
 

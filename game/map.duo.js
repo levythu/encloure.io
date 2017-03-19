@@ -1,11 +1,21 @@
 // This is a duo-end source. Be careful not to be NodeJs-specified (require any package)
 // or Browser-specified (use DOM or jQuery)
 
+// NewMap(int width, int height)    gets a map
+// map.Set(int x, int y, int value) sets a value to map
+// map.Get(int x, int y)            gets a value from map
+// map.Show()                       print the map to console
+// map.FloodFill({} dict)           perform a floodfill and mark all district
+//                                  surrounded by the trailing of ids in the dict as enclosed.
+
 (function() {
     var constant={
-        NO_OCCUPATION: -1,
-        NOT_DECIDED: -100,
+        NO_OCCUPATION: -1,  // used to set a cell for empty
+        NOT_DECIDED: -100,  // not used outside
 
+         // i+DIM_GAP*k is treated all as player i. To be precise, i is the enclosed
+         // district, i+DIM_GAP is the un enclosed trailing, the further numbers
+         // are reserved.
         DIM_GAP: 100000,
     };
     function NewMap(width, height) {
