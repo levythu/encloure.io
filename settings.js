@@ -3,8 +3,11 @@ module.exports={
     // before connecting to server.
     game: {
         FPS:        40,
-        RPS:        2,
+        RPS:        8,
         MapSize:    [100, 100],
+        player:     {
+            speed:  4,  // how many RPS does one move
+        },
     },
 
     server: {

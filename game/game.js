@@ -48,6 +48,8 @@ function NewGame(server) {
         playerProfile.y=Math.floor(Math.random()*conf.game.MapSize[1]);
         playerProfile.d=CONTROL_DIR.r;
         playerProfile.color=PALLET[colorChoosen];
+        playerProfile.speed=conf.game.player.speed;
+        playerProfile.shouldMove=playerProfile.speed;
         colorChoosen=(colorChoosen+1)%PALLET.length;
 
         var newJoin={};
@@ -65,10 +67,19 @@ function NewGame(server) {
             player[id].d=CONTROL_DIR[obj.dir];
         }
     }
+
+    var lastMove=0;
     game.onTick=function() {
         var newMove={};
+        var shouldBC=false;
         for (i in player) {
             var prof=player[i];
+
+            prof.shouldMove--;
+            if (prof.shouldMove>0) continue;
+            prof.shouldMove=prof.speed;
+            shouldBC=true;
+
             prof.x=prof.x+prof.d[0];
             if (prof.x<0) prof.x=0;
             else if (prof.x>=conf.game.MapSize[0]) prof.x=conf.game.MapSize[0]-1;
@@ -80,9 +91,14 @@ function NewGame(server) {
                 y: prof.y,
             };
         }
-        server.Broadcast({
-            move: newMove,
-        });
+        lastMove++;
+        if (shouldBC) {
+            newMove._delta=lastMove;
+            server.Broadcast({
+                move: newMove,
+            });
+            lastMove=0;
+        }
 
         nextPoint+=interval;
         var nowPoint=(new Date()).getTime();

@@ -84,9 +84,9 @@ $(function(){
                 var player=players[i];
                 if (player==null) continue;
                 if (!("sx" in moves[0][i])) {
-                    moves[0][i].sx=(moves[0][i].x-player.x)*globalConf.RPS/globalConf.FPS;
-                    moves[0][i].sy=(moves[0][i].y-player.y)*globalConf.RPS/globalConf.FPS;
-                    moves[0][i].rest=Math.ceil(globalConf.FPS/globalConf.RPS);
+                    moves[0][i].sx=(moves[0][i].x-player.x)*globalConf.RPS/moves[0]._delta/globalConf.FPS;
+                    moves[0][i].sy=(moves[0][i].y-player.y)*globalConf.RPS/moves[0]._delta/globalConf.FPS;
+                    moves[0][i].rest=Math.ceil(globalConf.FPS*moves[0]._delta/globalConf.RPS);
                 }
                 player.x+=moves[0][i].sx;
                 player.y+=moves[0][i].sy;
