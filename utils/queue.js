@@ -57,6 +57,13 @@
         this.len--;
         return this.map[position];
     }
+    Queue.prototype.Peak=function()
+    {
+        if (this.len==0)
+            return null;
+        var position=this.prv[this.tail];
+        return this.map[position];
+    }
 
     if ( typeof module !== 'undefined' ) {
         module.exports=Queue;

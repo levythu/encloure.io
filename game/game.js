@@ -54,12 +54,17 @@ function NewGame(server) {
 
         var newJoin={};
         newJoin[id]=playerProfile;
+        var now=(new Date()).getTime();
         server.Broadcast({
             join: newJoin,
+            _epic: now,
         });
         server.Send(id, {
             join: player,
+            _init: true,
+            _epic: now,
         });
+        playerProfile.lastMoveTime=now;
     };
     // id is a string and obj is a js-object
     game.onControl=function(id, obj) {
@@ -68,8 +73,8 @@ function NewGame(server) {
         }
     }
 
-    var lastMove=0;
     game.onTick=function() {
+        var now=(new Date()).getTime();
         var newMove={};
         var shouldBC=false;
         for (i in player) {
@@ -86,18 +91,19 @@ function NewGame(server) {
             prof.y=prof.y+prof.d[1];
             if (prof.y<0) prof.y=0;
             else if (prof.y>=conf.game.MapSize[1]) prof.y=conf.game.MapSize[1]-1;
+
             newMove[i]={
                 x: prof.x,
                 y: prof.y,
             };
+            prof.lastMoveTime=now;
         }
-        lastMove++;
         if (shouldBC) {
-            newMove._delta=lastMove;
+            newMove._epic=now;
             server.Broadcast({
                 move: newMove,
+                _epic: now,
             });
-            lastMove=0;
         }
 
         nextPoint+=interval;
