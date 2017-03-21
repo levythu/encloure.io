@@ -4,16 +4,22 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('enclosure.io:server');
+var conf=require("../settings");
+var port = normalizePort(process.argv[2]);
+
+conf.server.port=port;
+
+var app = require('../gameserver/gameapp');
+var debug = require('debug')('enclosure.io:gameserver');
 var http = require('http');
+
+app.set('port', port);
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+
 
 /**
  * Listen on provided port, on all network interfaces.

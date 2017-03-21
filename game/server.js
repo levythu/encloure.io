@@ -2,7 +2,7 @@ var conf=require("../settings");
 var game=require("./game");
 var WebSocket=require("ws");
 
-function NewServer() {
+function NewServer(callback) {
     var count=0;
     var clients={};
 
@@ -40,7 +40,9 @@ function NewServer() {
 
     }
 
-    var wss = new WebSocket.Server({ port: 2333 });
+    var wss = new WebSocket.Server({ port: 0 }, function() {
+        callback("ws://"+conf.server.hostname+":"+wss._server.address().port);
+    });
     wss.on('connection', function(ws) {
         var thisCount=""+(count++);
         console.log("Client #"+thisCount+" connects.");
@@ -93,7 +95,6 @@ function NewServer() {
     }
 
     g.Start();
-    return "ws://"+conf.server.hostname+":2333";
 }
 
 exports.NewServer=NewServer;
