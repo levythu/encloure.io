@@ -14,6 +14,16 @@ exports.LaunchGame=function(callback) {
 
 }
 
+function disconnectMaster(err) {
+    request.post(conf.server.masterEndPoint+"/gm/unregister", {form: {
+        endpoint: "http://"+conf.server.hostname+":"+conf.server.port,
+        secret: conf.server.masterSecret,
+    }}, function() {
+        console.error(err);
+        console.log("Successfully unregistered with master, now exiting...");
+        process.exit(-1);
+    });
+}
 function connectMaster() {
     request.post(conf.server.masterEndPoint+"/gm/register", {form: {
         endpoint: "http://"+conf.server.hostname+":"+conf.server.port,
@@ -24,6 +34,9 @@ function connectMaster() {
             throw "Not able to register to master: "+err;
         }
         console.log("Successfully registered with master.");
+        process.on('SIGINT', disconnectMaster);
+        //catches uncaught exceptions
+        process.on('uncaughtException', disconnectMaster);
     });
 }
 

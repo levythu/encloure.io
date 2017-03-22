@@ -9,13 +9,24 @@ var Lock=require("../utils/lock");
 var list={};
 
 router.post('/register', function(req, res) {
+    if (req.body.secret!==conf.server.masterSecret) {
+        res.status(403).send("Invalid secret.");
+        return;
+    }
+    console.log("Registered: "+req.body.endpoint);
+
+    list[req.body.endpoint]=req.body.token;
+    res.send("OK.");
+});
+
+router.post('/unregister', function(req, res) {
     console.log(req.body);
     if (req.body.secret!==conf.server.masterSecret) {
         res.status(403).send("Invalid secret.");
         return;
     }
 
-    list[req.body.endpoint]=req.body.token;
+    delete list[req.body.endpoint];
     res.send("OK.");
 });
 
