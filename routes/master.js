@@ -19,6 +19,9 @@ router.post('/register', function(req, res) {
     res.send("OK.");
 });
 
+// this is a temp behavior
+var theserverEndpoint=null;
+var mutex=new Lock();
 router.post('/unregister', function(req, res) {
     console.log(req.body);
     if (req.body.secret!==conf.server.masterSecret) {
@@ -28,11 +31,13 @@ router.post('/unregister', function(req, res) {
 
     delete list[req.body.endpoint];
     res.send("OK.");
+
+    mutex.Lock(function() {
+        theserverEndpoint=null;
+        mutex.Unlock();
+    });
 });
 
-// this is a temp behavior
-var theserverEndpoint=null;
-var mutex=new Lock();
 router.get('/getserver', function(req, res) {
     mutex.Lock(function() {
         if (theserverEndpoint==null) {
