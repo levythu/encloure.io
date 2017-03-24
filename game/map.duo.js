@@ -57,19 +57,24 @@
                 }
             }
         }
-        map.Set=function(x, y, v) {
+        map.Set=function(x, y, v, upsert=true) {
             var p=x*height+y;
             var oldv=map.c[x][y];
             if (v===oldv) return;
 
             var oldv=map.c[x][y];
             if (oldv>=0) {
-                var c=v%map.DIM_GAP;
-                delete colorRever[c].elems[p];
+                var c=oldv%map.DIM_GAP;
+                if (c in colorRever) delete colorRever[c].elems[p];
             }
             if (v>=0) {
                 var c=v%map.DIM_GAP;
                 if (!(c in colorRever)) {
+                    if (!upsert) {
+                        // if not exist, set it to nonexistent
+                        map.c[x][y]=map.NO_OCCUPATION;
+                        return;
+                    };
                     colorRever[c]={
                         xmin: x,
                         xmax: x,
@@ -103,6 +108,20 @@
                     t+=map.c[i][j]+"\t";
                 }
                 console.log(t);
+            }
+        }
+
+        map.DeleteColor=function(colorId) {
+            var colorId=-(-colorId);
+            var singleRever=colorRever[colorId];
+            if (singleRever==null) return;
+            delete colorRever[colorId];
+
+            for (var e in singleRever.elems) {
+                var p=-(-e);
+                var oldv=singleRever.elems[e];
+                if (oldv%1!==0) oldv-=0.1;
+                map.Set(Math.floor(p/height), p%height, oldv, false);
             }
         }
 

@@ -71,8 +71,10 @@ function NewGame(server) {
     };
     // id is a string and obj is a js-object
     game.onControl=function(id, obj) {
-        if (obj.dir in CONTROL_DIR) {
-            player[id].d=CONTROL_DIR[obj.dir];
+        if (id in player) {
+            if (obj.dir in CONTROL_DIR) {
+                player[id].d=CONTROL_DIR[obj.dir];
+            }
         }
     }
 
@@ -81,6 +83,7 @@ function NewGame(server) {
         var newMove={};
         var shouldBC=false;
         var floodList={};
+        var die={};
         for (i in player) {
             var prof=player[i];
 
@@ -90,11 +93,21 @@ function NewGame(server) {
             shouldBC=true;
 
             prof.x=prof.x+prof.d[0];
-            if (prof.x<0) prof.x=0;
-            else if (prof.x>=conf.game.MapSize[0]) prof.x=conf.game.MapSize[0]-1;
+            if (prof.x<0) {
+                die[i]=true;
+                continue;
+            } else if (prof.x>=conf.game.MapSize[0]) {
+                die[i]=true;
+                continue;
+            }
             prof.y=prof.y+prof.d[1];
-            if (prof.y<0) prof.y=0;
-            else if (prof.y>=conf.game.MapSize[1]) prof.y=conf.game.MapSize[1]-1;
+            if (prof.y<0) {
+                die[i]=true;
+                continue;
+            } else if (prof.y>=conf.game.MapSize[1]) {
+                die[i]=true;
+                continue;
+            }
 
             newMove[i]={
                 x: prof.x,
@@ -106,9 +119,25 @@ function NewGame(server) {
                 floodList[v]=true;
             } else if (v==game.map.NO_OCCUPATION) {
                 game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+            } else if (v>=game.map.DIM_GAP && v<game.map.DIM_GAP*2) {
+                // walk in someone.
+                var victim=v-game.map.DIM_GAP;
+                die[victim]=true;
+                if (player[victim].x===prof.x && player[victim].y===prof.y) {
+                    // a head-to-head collosion! both die
+                    die[i]=true;
+                } else if (victim!=idnum) {
+                    game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+                }
+            } else if (v<game.map.DIM_GAP) {
+                game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
             }
 
             prof.lastMoveTime=now;
+        }
+        for (var i in die) {
+            game.map.DeleteColor(-(-i));
+            delete player[i];
         }
         for (var i in floodList) {
             game.map.FloodFill(i);
@@ -119,6 +148,7 @@ function NewGame(server) {
             server.Broadcast({
                 move: newMove,
                 enclose: floodList,
+                die: die,
                 _epic: now,
             });
         }

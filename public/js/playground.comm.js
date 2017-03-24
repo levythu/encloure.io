@@ -44,6 +44,14 @@ $(function(){
         N.send=function(obj) {
             connection.send(JSON.stringify(obj));
         };
+
+        N.close=function() {
+            try {
+                connection.close();
+            } catch (e) {
+                console.error(e);
+            }
+        }
     }).fail(function() {
         alert("Fail to get a game.");
     });

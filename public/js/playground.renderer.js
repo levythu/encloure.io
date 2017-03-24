@@ -20,21 +20,23 @@ $(function(){
     function fromNumIDtoID(numid) {
         return ""+numid;
     }
-    function renderPersistMapWhole() {
+    function renderPersistMapWhole(renderEmpty=false) {
+        persistCanvas.save();
         for (var i=0; i<globalConf.MapSize[0]; i++) {
             for (var j=0; j<globalConf.MapSize[1]; j++) {
                 if (map.c[i][j]>=0) {
                     var id=fromNumIDtoID(map.c[i][j] % map.DIM_GAP);
                     var dim=Math.floor(map.c[i][j] / map.DIM_GAP);
                     if (id in players) {
-                        persistCanvas.save();
                         persistCanvas.fillStyle=players[id].color[dim==0?2:1];
                         persistCanvas.fillRect(i*10, j*10, 10, 10);
-                        persistCanvas.restore();
                     }
+                } else if (renderEmpty) {
+                    persistCanvas.clearRect(i*10, j*10, 10, 10);
                 }
             }
         }
+        persistCanvas.restore();
     }
     function digestMove(mv, persistWholeRenderRequired=true, now=null) {
         if (now==null) now=(new Date()).getTime();
@@ -45,6 +47,16 @@ $(function(){
 
             var v=map.c[mv[i].x][mv[i].y];
             if (v==map.NO_OCCUPATION) {
+                persistCanvas.fillStyle=player.color[1];
+                persistCanvas.fillRect(mv[i].x*10, mv[i].y*10, 10, 10);
+
+                map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
+            } else if (v>=map.DIM_GAP && v<map.DIM_GAP*2) {
+                var victim=v-map.DIM_GAP;
+                if (victim!=player.idnum) {
+                    map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
+                }
+            } else if (v<map.DIM_GAP) {
                 persistCanvas.fillStyle=player.color[1];
                 persistCanvas.fillRect(mv[i].x*10, mv[i].y*10, 10, 10);
 
@@ -68,10 +80,28 @@ $(function(){
 
         }
         persistCanvas.restore();
+
+        var wantRender=false;
+        var hasDelete=false;
+        var idie=false;
+        if ("_die" in mv) {
+            for (var i in mv._die) {
+                map.DeleteColor(-(-i));
+                delete players[i];
+                if (i===globalConf.profile.id) idie=true;
+                if (persistWholeRenderRequired) wantRender=true;
+                hasDelete=true;
+            }
+        }
         if (("_enclose" in mv) && JSON.stringify(mv._enclose)!==JSON.stringify({})) {
             for (var i in mv._enclose) map.FloodFill(i);
-            if (persistWholeRenderRequired) renderPersistMapWhole();
+            if (persistWholeRenderRequired) wantRender=true;
         }
+        if (idie) {
+            N.close();
+            alert("Hey dude, you DIED!");
+        }
+        if (wantRender) renderPersistMapWhole(hasDelete);
     }
 
     function renderFrame() {
@@ -143,6 +173,9 @@ $(function(){
             console.log(JSON.stringify(obj.maprever));
             map._ChangeColorRever(obj.maprever);
             renderPersistMapWhole();
+        }
+        if ("die" in obj) {
+            obj.move._die=obj.die;
         }
         if ("enclose" in obj) {
             obj.move._enclose=obj.enclose;
