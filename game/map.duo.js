@@ -19,20 +19,20 @@
         DIM_GAP: 100000,
     };
     function NewMap(width, height) {
-        var blanks={};
         var map={};
+        var colorRever={};
 
         // save constants
         for (var i in constant) map[i]=constant[i];
 
         // initiate map
         map.c=[];
-        map._b=blanks;
+        map._r=colorRever;
+
         for (var i=0; i<width; i++) {
             var t=[];
             for (var j=0; j<height; j++) {
                 t.push(map.NO_OCCUPATION);
-                blanks[i*height+j]=true;
             }
             map.c.push(t);
         }
@@ -40,11 +40,35 @@
 
         map.Set=function(x, y, v) {
             var p=x*height+y;
-            if (v===map.NO_OCCUPATION) {
-                blanks[p]=true;
-            } else {
-                delete blanks[p];
+            var oldv=map.c[x][y];
+            if (v===oldv) return;
+            if (v>=0) {
+                var c=v%map.DIM_GAP;
+                if (!(c in colorRever)) {
+                    colorRever[c]={
+                        xmin: x,
+                        xmax: x,
+                        ymin: y,
+                        ymax: y,
+                        elems: {},
+                    };
+                } else {
+                    if (x<colorRever[c].xmin) colorRever[c].xmin=x;
+                    if (x>colorRever[c].xmax) colorRever[c].xmax=x;
+                    if (y<colorRever[c].ymin) colorRever[c].ymin=y;
+                    if (y>colorRever[c].ymax) colorRever[c].ymax=y;
+                }
+                if (c===v)  // is base color
+                    colorRever[c].elems[p]=map.NO_OCCUPATION;
+                else
+                    colorRever[c].elems[p]=map.c[x][y];
             }
+            var oldv=map.c[x][y];
+            if (oldv>=0) {
+                var c=v%map.DIM_GAP;
+                delete colorRever[c].elems[p];
+            }
+
             map.c[x][y]=v;
         }
 
@@ -65,62 +89,64 @@
         // FloodFill
         var cros=[[1, 0], [-1, 0], [0, 1], [0, -1]];
         var diag=[[1, 1], [-1, 1], [1, -1], [-1, -1]];
-        map.FloodFill=function(triggeredIdNumList={}) {
+        map.FloodFill=function(colorId) {
+            console.log(colorId);
+            var singleRever=colorRever[colorId];
+            if (singleRever==null) return;
             var round=map.NOT_DECIDED;
             var record={};
+            var blanks=[];
+            var blanksHead=0;
+            var visitMap={};
+            for (var i=singleRever.xmin; i<=singleRever.xmax; i++) {
+                var p=i*height;
+                for (var j=singleRever.ymin; j<=singleRever.ymax; j++) {
+                    if (map.c[i][j]==map.NO_OCCUPATION) blanks.push(p+j);
+                }
+            }
             while (true) {
-                var p=null;
-                for (var i in blanks) {
-                    p=i;
-                    break;
-                }
-                if (p==null) {
-                    break;
-                }
+                while (blanksHead<blanks.length && (blanks[blanksHead] in visitMap)) blanksHead++;
+                if (blanksHead==blanks.length) break;
+                var p=blanks[blanksHead++];
                 round--;
-                record[round]=map.NOT_DECIDED;
+                record[round]=true;
                 var stack=[[Math.floor(p/height), p%height]];
                 while (stack.length>0) {
                     var src=stack.pop();
-                    map.Set(src[0], src[1], round);
-                    if (record[round]!=-1) {
+                    visitMap[src[0]*height+src[1]]=round;
+                    if (record[round]) {
                         for (var i=0; i<cros.length; i++) {
                             var tx=src[0]+cros[i][0];
                             var ty=src[1]+cros[i][1];
-                            if (tx<0 || ty<0 || tx>=width || ty>=height) {
-                                record[round]=map.NO_OCCUPATION;
+                            if (tx<singleRever.xmin || ty<singleRever.ymin || tx>singleRever.xmax || ty>singleRever.ymax) {
+                                record[round]=false;
                                 break;
                             }
-                            if (map.c[tx][ty]<0) continue;
-                            if (record[round]>=0 && record[round]!=map.c[tx][ty]%map.DIM_GAP) {
-                                record[round]=map.NO_OCCUPATION;
-                                break;
-                            }
-                            record[round]=map.c[tx][ty]%map.DIM_GAP;
                         }
                     }
                     for (var i=0; i<cros.length; i++) {
                         var tx=src[0]+cros[i][0];
                         var ty=src[1]+cros[i][1];
-                        if (tx<0 || ty<0 || tx>=width || ty>=height) {
-                            break;
+                        if (tx<singleRever.xmin || ty<singleRever.ymin || tx>singleRever.xmax || ty>singleRever.ymax) {
+                            continue;
                         }
-                        if (map.c[tx][ty]==map.NO_OCCUPATION) {
-                            map.Set(tx, ty, round);
+                        var p=tx*height+ty;
+                        if (map.c[tx][ty]==map.NO_OCCUPATION && (!(p in visitMap))) {
+                            visitMap[p]=round;
                             stack.push([tx, ty]);
                         }
                     }
                 }
             }
-            for (var i=0; i<width; i++) {
-                for (var j=0; j<height; j++) {
+            console.log(visitMap);
+            for (var i=singleRever.xmin; i<=singleRever.xmax; i++) {
+                var p=i*height;
+                for (var j=singleRever.ymin; j<=singleRever.ymax; j++) {
                     if (map.c[i][j]>=0) {
                         var numid=map.c[i][j]%map.DIM_GAP;
-                        if (numid in triggeredIdNumList) map.c[i][j]=numid;
+                        if (numid==colorId) map.Set(i, j, colorId);
                     } else {
-                        var numid=record[map.c[i][j]];
-                        if (numid in triggeredIdNumList) map.Set(i, j, numid);
-                        else map.Set(i, j, map.NO_OCCUPATION);
+                        if (record[visitMap[p+j]]===true) map.Set(i, j, numid);
                     }
                 }
             }

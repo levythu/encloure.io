@@ -74,7 +74,7 @@ $(function(){
         }
         persistCanvas.restore();
         if (needFlood) {
-            map.FloodFill(floodList);
+            for (var i in floodList) map.FloodFill(i);
             if (persistWholeRenderRequired) renderPersistMapWhole();
         }
     }
