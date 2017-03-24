@@ -3,11 +3,11 @@ module.exports={
     // before connecting to server.
     game: {
         FPS:        40,
-        RPS:        8,
-        RPSLag:     4,
+        RPS:        4,
+        RPSLag:     1,      // the lag between client and server, typically the slowest speed
         MapSize:    [100, 100],
         player:     {
-            speed:  4,  // how many RPS does one move
+            speed:  1,  // how many RPS does one move
         },
     },
 
