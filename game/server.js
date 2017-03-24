@@ -2,15 +2,16 @@ var conf=require("../settings");
 var game=require("./game");
 var WebSocket=require("ws");
 
-function NewServer(callback) {
+function NewServer(callback, gameConf=conf.game.defaultMap) {
     var count=0;
     var clients={};
 
     var server={};
-    var g=game.NewGame(server);
+    var g=game.NewGame(server, gameConf);
     server.onConnect=function(client) {
         var tConf={};
         for (i in conf.game) tConf[i]=conf.game[i];
+        for (i in gameConf) tConf[i]=gameConf[i];
 
         g.JoinNewPlayer(client.profile.id, client.profile);
         tConf.profile=client.profile;

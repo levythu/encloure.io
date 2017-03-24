@@ -5,9 +5,14 @@ module.exports={
         FPS:        40,
         RPS:        4,
         RPSLag:     1,      // the lag between client and server, typically the slowest speed
-        MapSize:    [100, 100],
+
+        defaultMap: {
+            MapSize:    [100, 100], // default map size
+            MaxPlayer:  20,
+        },
+
         player:     {
-            speed:  1,  // how many RPS does one move
+            speed:      1,  // how many RPS does one move
         },
     },
 

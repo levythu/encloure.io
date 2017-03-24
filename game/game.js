@@ -27,7 +27,7 @@ var PALLET=conf.PALLET;
 // }
 
 // server is a server object from server.js
-function NewGame(server) {
+function NewGame(server, gameConf=conf.game.defaultMap) {
     var game={};
     var player={};
 
@@ -40,12 +40,12 @@ function NewGame(server) {
     var colorChoosen=0;
 
     game.position={};
-    game.map=Map(conf.game.MapSize[0], conf.game.MapSize[1]);
+    game.map=Map(gameConf.MapSize[0], gameConf.MapSize[1]);
     // id is a string and playerProfile is its profile to be initialized
     game.JoinNewPlayer=function(id, playerProfile) {
         player[id]=playerProfile;
-        playerProfile.x=Math.floor(Math.random()*conf.game.MapSize[0]);
-        playerProfile.y=Math.floor(Math.random()*conf.game.MapSize[1]);
+        playerProfile.x=Math.floor(Math.random()*gameConf.MapSize[0]);
+        playerProfile.y=Math.floor(Math.random()*gameConf.MapSize[1]);
         playerProfile.d=CONTROL_DIR.r;
         playerProfile.color=PALLET[colorChoosen];
         playerProfile.speed=conf.game.player.speed;
@@ -96,7 +96,7 @@ function NewGame(server) {
             if (prof.x<0) {
                 die[i]=true;
                 continue;
-            } else if (prof.x>=conf.game.MapSize[0]) {
+            } else if (prof.x>=gameConf.MapSize[0]) {
                 die[i]=true;
                 continue;
             }
@@ -104,7 +104,7 @@ function NewGame(server) {
             if (prof.y<0) {
                 die[i]=true;
                 continue;
-            } else if (prof.y>=conf.game.MapSize[1]) {
+            } else if (prof.y>=gameConf.MapSize[1]) {
                 die[i]=true;
                 continue;
             }
