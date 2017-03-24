@@ -76,7 +76,7 @@ function NewServer(callback) {
                 else
                     clients[i].msgPend.push(JSON.stringify(obj));
             } catch (e) {
-                // TODO remove the dead socket
+                delete clients[i];
             }
         }
     }
@@ -90,7 +90,7 @@ function NewServer(callback) {
             else
                 c.msgPend.push(JSON.stringify(obj));
         } catch (e) {
-            // TODO remove the dead socket
+            delete clients[id];
         }
     }
 
