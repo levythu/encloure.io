@@ -27,7 +27,7 @@
 
         // initiate map
         map.c=[];
-        map._r=colorRever;
+        map._r=colorRever;  //  {somecolornumber: {xmin: xx, xmax: xx, ymin: xx, ymax: xx, elems: {absPosition: recoverColor, ...}  }}, recoverColor will have extra 0.1 if covered color is traling
 
         for (var i=0; i<width; i++) {
             var t=[];
@@ -38,10 +38,35 @@
         }
         // membership functions
 
+        map._ChangeColorRever=function(newRever) {
+            colorRever=newRever;
+            map._r=colorRever;
+            for (var i=0; i<width; i++) {
+                for (var j=0; j<height; j++) {
+                    map.c[i][j]=map.NO_OCCUPATION;
+                }
+            }
+            for (var color in newRever) {
+                var numColor=-(-color);
+                for (var e in newRever[color].elems) {
+                    var p=-(-e);
+                    if (newRever[color].elems[e]%1==0)
+                        map.c[Math.floor(p/height)][p%height]=numColor;
+                    else
+                        map.c[Math.floor(p/height)][p%height]=numColor+map.DIM_GAP;
+                }
+            }
+        }
         map.Set=function(x, y, v) {
             var p=x*height+y;
             var oldv=map.c[x][y];
             if (v===oldv) return;
+
+            var oldv=map.c[x][y];
+            if (oldv>=0) {
+                var c=v%map.DIM_GAP;
+                delete colorRever[c].elems[p];
+            }
             if (v>=0) {
                 var c=v%map.DIM_GAP;
                 if (!(c in colorRever)) {
@@ -61,12 +86,7 @@
                 if (c===v)  // is base color
                     colorRever[c].elems[p]=map.NO_OCCUPATION;
                 else
-                    colorRever[c].elems[p]=map.c[x][y];
-            }
-            var oldv=map.c[x][y];
-            if (oldv>=0) {
-                var c=v%map.DIM_GAP;
-                delete colorRever[c].elems[p];
+                    colorRever[c].elems[p]=map.c[x][y]+0.1;
             }
 
             map.c[x][y]=v;
@@ -90,7 +110,7 @@
         var cros=[[1, 0], [-1, 0], [0, 1], [0, -1]];
         var diag=[[1, 1], [-1, 1], [1, -1], [-1, -1]];
         map.FloodFill=function(colorId) {
-            console.log(colorId);
+            var colorId=-(-colorId);
             var singleRever=colorRever[colorId];
             if (singleRever==null) return;
             var round=map.NOT_DECIDED;
@@ -138,7 +158,6 @@
                     }
                 }
             }
-            console.log(visitMap);
             for (var i=singleRever.xmin; i<=singleRever.xmax; i++) {
                 var p=i*height;
                 for (var j=singleRever.ymin; j<=singleRever.ymax; j++) {

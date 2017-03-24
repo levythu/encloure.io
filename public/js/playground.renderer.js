@@ -37,8 +37,6 @@ $(function(){
         }
     }
     function digestMove(mv, persistWholeRenderRequired=true, now=null) {
-        var needFlood=false;
-        var floodList={};
         if (now==null) now=(new Date()).getTime();
         persistCanvas.save();
         for (var i in mv) {
@@ -46,10 +44,7 @@ $(function(){
             if (player==null) continue;
 
             var v=map.c[mv[i].x][mv[i].y];
-            if (v==player.idnum) {
-                needFlood=true;
-                floodList[v]=true;
-            } else if (v==map.NO_OCCUPATION) {
+            if (v==map.NO_OCCUPATION) {
                 persistCanvas.fillStyle=player.color[1];
                 persistCanvas.fillRect(mv[i].x*10, mv[i].y*10, 10, 10);
 
@@ -73,8 +68,8 @@ $(function(){
 
         }
         persistCanvas.restore();
-        if (needFlood) {
-            for (var i in floodList) map.FloodFill(i);
+        if (("_enclose" in mv) && JSON.stringify(mv._enclose)!==JSON.stringify({})) {
+            for (var i in mv._enclose) map.FloodFill(i);
             if (persistWholeRenderRequired) renderPersistMapWhole();
         }
     }
@@ -112,11 +107,16 @@ $(function(){
         mp=map;
         $(".kernelCanvas").attr("width",  CANVAS_WIDTH)
                           .attr("height", CANVAS_HEIGHT);
-        setInterval(renderFrame, 1000/globalConf.FPS);
     });
 
+    var inited=false;
     $("body").on("gm-msg", function(e, obj) {
         var now=(new Date()).getTime();
+        if ("_init" in obj) {
+            setInterval(renderFrame, 1000/globalConf.FPS);
+            inited=true;
+        }
+        if (!inited) return;
         if ("join" in obj) {
             for (var i in obj.join) {
                 players[i]=obj.join[i];
@@ -132,12 +132,20 @@ $(function(){
                 persistCanvas.fillRect(players[i].ox*10, players[i].oy*10, 10, 10);
                 persistCanvas.restore();
 
-                map.Set(players[i].ox, players[i].oy, players[i].idnum);
+                if (obj._init!==true) map.Set(players[i].ox, players[i].oy, players[i].idnum);
             }
             if (obj._init===true) {
                 startServerEpic=obj._epic;
                 startLocalEpic=now;
             }
+        }
+        if ("maprever" in obj) {
+            console.log(JSON.stringify(obj.maprever));
+            map._ChangeColorRever(obj.maprever);
+            renderPersistMapWhole();
+        }
+        if ("enclose" in obj) {
+            obj.move._enclose=obj.enclose;
         }
         if ("move" in obj) {
             moves.EnQueue(obj.move);

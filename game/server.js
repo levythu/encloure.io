@@ -19,7 +19,7 @@ function NewServer(callback) {
         try {
             client.ws.send(JSON.stringify(tConf));
             for (var i=0; i<client.msgPend.length; i++) {
-                client.ws.send(JSON.stringify(client.msgPend[i]));
+                client.ws.send(client.msgPend[i]);
             }
             client.msgPend=[];
             client.ready=true;
@@ -57,7 +57,7 @@ function NewServer(callback) {
         };
         clients[thisCount]=client;
         ws.on("message", function(msg) {
-            console.log(msg);
+            // console.log(msg);
             server.onMessage(client, msg);
         });
         ws.on("close", function(msg) {
@@ -74,7 +74,7 @@ function NewServer(callback) {
                 if (clients[i].ready)
                     clients[i].ws.send(JSON.stringify(obj));
                 else
-                    clients[i].msgPend.push(obj);
+                    clients[i].msgPend.push(JSON.stringify(obj));
             } catch (e) {
                 // TODO remove the dead socket
             }
@@ -88,7 +88,7 @@ function NewServer(callback) {
             if (c.ready)
                 c.ws.send(JSON.stringify(obj));
             else
-                c.msgPend.push(obj);
+                c.msgPend.push(JSON.stringify(obj));
         } catch (e) {
             // TODO remove the dead socket
         }

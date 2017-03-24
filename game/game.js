@@ -1,5 +1,5 @@
 var conf=require("../settings");
-var map=require("./map.duo");
+var Map=require("./map.duo");
 
 var CONTROL_DIR={
     "u":    [0, -1],
@@ -40,7 +40,7 @@ function NewGame(server) {
     var colorChoosen=0;
 
     game.position={};
-    game.map=map(conf.game.MapSize[0], conf.game.MapSize[1]);
+    game.map=Map(conf.game.MapSize[0], conf.game.MapSize[1]);
     // id is a string and playerProfile is its profile to be initialized
     game.JoinNewPlayer=function(id, playerProfile) {
         player[id]=playerProfile;
@@ -52,6 +52,8 @@ function NewGame(server) {
         playerProfile.shouldMove=playerProfile.speed;
         colorChoosen=(colorChoosen+1)%PALLET.length;
 
+        game.map.Set(playerProfile.x, playerProfile.y, -(-id));
+
         var newJoin={};
         newJoin[id]=playerProfile;
         var now=(new Date()).getTime();
@@ -61,6 +63,7 @@ function NewGame(server) {
         });
         server.Send(id, {
             join: player,
+            maprever: game.map._r,
             _init: true,
             _epic: now,
         });
@@ -77,6 +80,7 @@ function NewGame(server) {
         var now=(new Date()).getTime();
         var newMove={};
         var shouldBC=false;
+        var floodList={};
         for (i in player) {
             var prof=player[i];
 
@@ -96,12 +100,25 @@ function NewGame(server) {
                 x: prof.x,
                 y: prof.y,
             };
+            var idnum=-(-i);
+            var v=game.map.c[prof.x][prof.y];
+            if (v==idnum) {
+                floodList[v]=true;
+            } else if (v==game.map.NO_OCCUPATION) {
+                game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+            }
+
             prof.lastMoveTime=now;
         }
+        for (var i in floodList) {
+            game.map.FloodFill(i);
+        }
+
         if (shouldBC) {
             newMove._epic=now;
             server.Broadcast({
                 move: newMove,
+                enclose: floodList,
                 _epic: now,
             });
         }
