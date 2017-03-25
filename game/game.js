@@ -49,16 +49,22 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
     game.map=Map(gameConf.MapSize[0], gameConf.MapSize[1]);
     // id is a string and playerProfile is its profile to be initialized
     game.JoinNewPlayer=function(id, playerProfile) {
+        var resTuple=game.map.FindSpawnPlace();
+        if (resTuple==null) {
+            // no place to spawn
+            playerProfile._fail=true;
+            return;
+        }
         player[id]=playerProfile;
-        playerProfile.x=Math.floor(Math.random()*gameConf.MapSize[0]);
-        playerProfile.y=Math.floor(Math.random()*gameConf.MapSize[1]);
+        playerProfile.x=resTuple[0];
+        playerProfile.y=resTuple[1];
         playerProfile.d=CONTROL_DIR.r;
         playerProfile.color=PALLET[colorChoosen];
         playerProfile.speed=conf.game.player.speed;
         playerProfile.shouldMove=playerProfile.speed;
         colorChoosen=(colorChoosen+1)%PALLET.length;
 
-        game.map.Set(playerProfile.x, playerProfile.y, -(-id));
+        game.map.SpawnNew(playerProfile.x, playerProfile.y, -(-id));
 
         var newJoin={};
         newJoin[id]=playerProfile;

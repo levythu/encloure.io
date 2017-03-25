@@ -22,11 +22,11 @@ $(function(){
     function fromNumIDtoID(numid) {
         return ""+numid;
     }
-    function renderPersistMapWhole(renderEmpty=false) {
+    function renderPersistMapWhole(renderEmpty=false, xstart=0, xend=globalConf.MapSize[0]-1, ystart=0, yend=globalConf.MapSize[1]-1) {
         persistCanvas.save();
         persistCanvasShadow.save();
-        for (var i=0; i<globalConf.MapSize[0]; i++) {
-            for (var j=0; j<globalConf.MapSize[1]; j++) {
+        for (var i=xstart; i<=xend; i++) {
+            for (var j=ystart; j<=yend; j++) {
                 if (map.c[i][j]>=0) {
                     var id=fromNumIDtoID(map.c[i][j] % map.DIM_GAP);
                     var dim=Math.floor(map.c[i][j] / map.DIM_GAP);
@@ -139,7 +139,7 @@ $(function(){
         mainCanvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         for (var i in players) {
             var player=players[i];
-            mainCanvas.fillStyle=player.color[3];
+            mainCanvas.fillStyle=player.color[2];
             mainCanvas.fillRect(player.x*renderAmplification, player.y*renderAmplification+3, renderAmplification, renderAmplification);
             mainCanvas.fillStyle=player.color[0];
             mainCanvas.fillRect(player.x*renderAmplification, player.y*renderAmplification, renderAmplification, renderAmplification);
@@ -160,6 +160,9 @@ $(function(){
                           .attr("height", CANVAS_HEIGHT)
                           .css("width", CANVAS_WIDTH)
                           .css("height", CANVAS_HEIGHT);
+        if (globalConf.profile._fail===true) {
+            alert("The room is dominated by someone!");
+        }
     });
 
     var inited=false;
@@ -180,16 +183,11 @@ $(function(){
                 players[i].dy=0;
                 players[i].moves=new Queue();
 
-                persistCanvas.save();
-                persistCanvasShadow.save();
-                persistCanvas.fillStyle=players[i].color[2];
-                persistCanvasShadow.fillStyle=players[i].color[3];
-                persistCanvas.fillRect(players[i].ox*renderAmplification, players[i].oy*renderAmplification, renderAmplification, renderAmplification);
-                persistCanvasShadow.fillRect(players[i].ox*renderAmplification, players[i].oy*renderAmplification+3, renderAmplification, renderAmplification);
-                persistCanvas.restore();
-                persistCanvasShadow.restore();
+                if (obj._init!==true) {
+                    map.SpawnNew(players[i].ox, players[i].oy, players[i].idnum);
+                    renderPersistMapWhole(players[i].ox-1, players[i].ox+1, players[i].oy-1, players[i].oy+1);
+                }
 
-                if (obj._init!==true) map.Set(players[i].ox, players[i].oy, players[i].idnum);
             }
             if (obj._init===true) {
                 startServerEpic=obj._epic;

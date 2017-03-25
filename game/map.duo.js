@@ -56,7 +56,48 @@
                         map.c[Math.floor(p/height)][p%height]=numColor+map.DIM_GAP;
                 }
             }
+        };
+
+        var diagcros=[[1, 1], [-1, 1], [1, -1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]];
+        // can provide a list of available point by [(x,y), ...], otherwise all the free space may be available
+        // return [x0, y0], or null if not available
+        map.FindSpawnPlace=function(apoint=null) {
+            if (apoint==null) {
+                apoint=[];
+                for (var i=1; i<width-1; i++) {
+                    for (var j=1; j<height-1; j++) {
+                        if (map.c[i][j]==map.NO_OCCUPATION) apoint.push([i, j]);
+                    }
+                }
+            }
+            var tail=apoint.length;
+            while (tail>0) {
+                var rPos=Math.floor(Math.random()*tail);
+                var thePoint=apoint[rPos];
+                var i;
+                for (i=0; i<diagcros.length; i++) {
+                    if (map.c[thePoint[0]+diagcros[i][0]][thePoint[1]+diagcros[i][1]]!=map.NO_OCCUPATION)
+                        break;
+                }
+                if (i==diagcros.length) {
+                    return thePoint;
+                }
+
+                var t=apoint[rPos];
+                apoint[rPos]=apoint[tail-1];
+                apoint[tail-1]=t;
+                tail--;
+            }
+            return null;
+        };
+
+        map.SpawnNew=function(x, y, color) {
+            for (i=0; i<diagcros.length; i++) {
+                map.Set(x+diagcros[i][0], y+diagcros[i][1], color);
+            }
+            map.Set(x, y, color);
         }
+
         map.Set=function(x, y, v, upsert=true) {
             var p=x*height+y;
             var oldv=map.c[x][y];
