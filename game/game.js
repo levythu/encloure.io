@@ -7,6 +7,12 @@ var CONTROL_DIR={
     "l":    [-1, 0],
     "r":    [1 , 0],
 }
+var CONTRADICT_DIR={
+    "u":    "d",
+    "d":    "u",
+    "l":    "r",
+    "r":    "l",
+};
 var PALLET=conf.PALLET;
 
 // # Server to Client communication:
@@ -73,6 +79,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
     game.onControl=function(id, obj) {
         if (id in player) {
             if (obj.dir in CONTROL_DIR) {
+                if (player[id].d===CONTROL_DIR[CONTRADICT_DIR[obj.dir]]) return;
                 player[id].d=CONTROL_DIR[obj.dir];
             }
         }
