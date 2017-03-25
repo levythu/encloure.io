@@ -18,12 +18,16 @@ module.exports={
 
     server: {
         // the public hostname, useful for both gameserver and master
-        hostname: "aws.levy.at",
+        hostname: "ec2-34-207-137-52.compute-1.amazonaws.com",
 
         // will be used only for gameserver, indicating where's the master
-        masterEndPoint: "http://aws.levy.at:3000",
+        masterEndPoint: "http://ec2-34-207-137-52.compute-1.amazonaws.com:3000",
         // useful for both server, gameserver use this to register on master
         masterSecret: "BingoLingo!",
+    },
+
+    database: {
+        url : "mongodb://localhost:27016/enclosure",
     },
 
     // `pallet` describe the color pattern that will be used for display.

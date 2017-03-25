@@ -5,6 +5,8 @@ var request=require("request");
 
 var conf=require("../settings");
 var Lock=require("../utils/lock");
+var db=require("../models/db");
+
 
 var list={};
 
@@ -15,6 +17,7 @@ router.post('/register', function(req, res) {
     }
     console.log("Registered: "+req.body.endpoint);
 
+    db.insertDoc('gameServers', {endpoint:req.body.endpoint, token:req.body.token}, function(){});
     list[req.body.endpoint]=req.body.token;
     res.send("OK.");
 });
@@ -28,7 +31,7 @@ router.post('/unregister', function(req, res) {
         res.status(403).send("Invalid secret.");
         return;
     }
-
+    db.deleteDoc('gameServers', {endpoint:req.body.endpoint}, function(){});
     delete list[req.body.endpoint];
     res.send("OK.");
 
