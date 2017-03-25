@@ -7,8 +7,11 @@
 - NPM
 
 ### Install Packages & Run:
+- Modify configuration in `settings.js`, especially the `server` sub-settings.
 - `npm install` to install required packages (root privilege may be required)
-- `npm start` to start the server & listening on port 3000
+    - To successfully do this, please ensure all file in `bin/` has executive permission by `chmod +x bin/*`
+- `npm start` to start the master server & listening on port 3000
+- On other console/machine, run `nodejs ./bin/launch-game-server.js [available-port]` to launch at least one game server.
 
 ## Documentation
 
