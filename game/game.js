@@ -1,5 +1,6 @@
 var conf=require("../settings");
 var Map=require("./map.duo");
+var getname=require("./stupidNameGenerator");
 
 var CONTROL_DIR={
     "u":    [0, -1],
@@ -62,6 +63,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         playerProfile.color=PALLET[colorChoosen];
         playerProfile.speed=conf.game.player.speed;
         playerProfile.shouldMove=playerProfile.speed;
+        playerProfile.nick=getname();
         colorChoosen=(colorChoosen+1)%PALLET.length;
 
         game.map.SpawnNew(playerProfile.x, playerProfile.y, -(-id));

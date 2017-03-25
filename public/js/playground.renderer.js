@@ -144,6 +144,16 @@ $(function(){
             mainCanvas.fillStyle=player.color[0];
             mainCanvas.fillRect(player.x*renderAmplification, player.y*renderAmplification, renderAmplification, renderAmplification);
         }
+        for (var i in players) {
+            var player=players[i];
+            mainCanvas.textAlign="center";
+            mainCanvas.font="17px Helvetica";
+            mainCanvas.fillStyle=player.color[3];
+            var basex=player.x*renderAmplification+renderAmplification/2;
+            mainCanvas.fillText(player.nick, basex, player.y*renderAmplification-2);
+            mainCanvas.fillStyle=player.color[0];
+            mainCanvas.fillText(player.nick, basex, player.y*renderAmplification-3);
+        }
         mainCanvas.restore();
 
         if (globalConf.profile.id in players) {
