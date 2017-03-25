@@ -17,8 +17,11 @@
     <script type="text/javascript" src="/js/playground.renderer.js"></script>
 </head>
 <body>
-    <canvas id="persistCanvas" class="maxSize kernelCanvas"></canvas>
-    <canvas id="mainCanvas" class="maxSize kernelCanvas"></canvas>
+    <div id="container">
+        <canvas id="persistCanvasShadow" class="maxSize kernelCanvas movingCanvas"></canvas>
+        <canvas id="persistCanvas" class="maxSize kernelCanvas movingCanvas"></canvas>
+        <canvas id="mainCanvas" class="maxSize kernelCanvas movingCanvas"></canvas>
+    </div>
 </body>
 
 </html>

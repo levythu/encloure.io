@@ -3,9 +3,11 @@ var mp;
 
 $(function(){
     var Queue=window._extension.Queue;
+    var renderAmplification=30;
 
     var mainCanvas=$("#mainCanvas")[0].getContext("2d");
     var persistCanvas=$("#persistCanvas")[0].getContext("2d");
+    var persistCanvasShadow=$("#persistCanvasShadow")[0].getContext("2d");
     var CANVAS_WIDTH, CANVAS_HEIGHT;      // in pixel!
     var players={};
     var map;
@@ -22,6 +24,7 @@ $(function(){
     }
     function renderPersistMapWhole(renderEmpty=false) {
         persistCanvas.save();
+        persistCanvasShadow.save();
         for (var i=0; i<globalConf.MapSize[0]; i++) {
             for (var j=0; j<globalConf.MapSize[1]; j++) {
                 if (map.c[i][j]>=0) {
@@ -29,14 +32,22 @@ $(function(){
                     var dim=Math.floor(map.c[i][j] / map.DIM_GAP);
                     if (id in players) {
                         persistCanvas.fillStyle=players[id].color[dim==0?2:1];
-                        persistCanvas.fillRect(i*10, j*10, 10, 10);
+                        persistCanvas.fillRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
+                        if (dim==0) {
+                            persistCanvasShadow.fillStyle=players[id].color[3];
+                            persistCanvasShadow.fillRect(i*renderAmplification, j*renderAmplification+3, renderAmplification, renderAmplification);
+                        } else {
+                            persistCanvasShadow.clearRect(i*renderAmplification, j*renderAmplification+3, renderAmplification, renderAmplification);
+                        }
                     }
                 } else if (renderEmpty) {
-                    persistCanvas.clearRect(i*10, j*10, 10, 10);
+                    persistCanvas.clearRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
+                    persistCanvasShadow.clearRect(i*renderAmplification, j*renderAmplification+3, renderAmplification, renderAmplification);
                 }
             }
         }
         persistCanvas.restore();
+        persistCanvasShadow.restore();
     }
     function digestMove(mv, persistWholeRenderRequired=true, now=null) {
         if (now==null) now=(new Date()).getTime();
@@ -48,8 +59,7 @@ $(function(){
             var v=map.c[mv[i].x][mv[i].y];
             if (v==map.NO_OCCUPATION) {
                 persistCanvas.fillStyle=player.color[1];
-                persistCanvas.fillRect(mv[i].x*10, mv[i].y*10, 10, 10);
-
+                persistCanvas.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
                 map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
             } else if (v>=map.DIM_GAP && v<map.DIM_GAP*2) {
                 var victim=v-map.DIM_GAP;
@@ -58,7 +68,7 @@ $(function(){
                 }
             } else if (v<map.DIM_GAP) {
                 persistCanvas.fillStyle=player.color[1];
-                persistCanvas.fillRect(mv[i].x*10, mv[i].y*10, 10, 10);
+                persistCanvas.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
 
                 map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
             }
@@ -104,6 +114,13 @@ $(function(){
         if (wantRender) renderPersistMapWhole(hasDelete);
     }
 
+    function adjustZoom(posInCanvasToCenter/*[x, y]*/) {
+        var width=$("#container").width();
+        var height=$("#container").height();
+        $(".movingCanvas").css("left", width/2-posInCanvasToCenter[0]);
+        $(".movingCanvas").css("top", height/2-posInCanvasToCenter[1]);
+    }
+
     function renderFrame() {
         var now=(new Date()).getTime();
         var renderUntil=now-startLocalEpic+startServerEpic-globalConf.RPSLag*1000/globalConf.RPS;
@@ -123,20 +140,26 @@ $(function(){
         for (var i in players) {
             var player=players[i];
             mainCanvas.fillStyle=player.color[3];
-            mainCanvas.fillRect(player.x*10-1, player.y*10, 10, 11);
+            mainCanvas.fillRect(player.x*renderAmplification, player.y*renderAmplification+3, renderAmplification, renderAmplification);
             mainCanvas.fillStyle=player.color[0];
-            mainCanvas.fillRect(player.x*10, player.y*10, 10, 10);
+            mainCanvas.fillRect(player.x*renderAmplification, player.y*renderAmplification, renderAmplification, renderAmplification);
         }
         mainCanvas.restore();
+
+        if (globalConf.profile.id in players) {
+            adjustZoom([players[globalConf.profile.id].x*renderAmplification, players[globalConf.profile.id].y*renderAmplification]);
+        }
     }
 
     $("body").on("gm-init", function() {
-        CANVAS_WIDTH=globalConf.MapSize[0]*10;
-        CANVAS_HEIGHT=globalConf.MapSize[1]*10;
+        CANVAS_WIDTH=globalConf.MapSize[0]*30;
+        CANVAS_HEIGHT=globalConf.MapSize[1]*30;
         map=window._extension.NewMap(globalConf.MapSize[0], globalConf.MapSize[1]);
         mp=map;
         $(".kernelCanvas").attr("width",  CANVAS_WIDTH)
-                          .attr("height", CANVAS_HEIGHT);
+                          .attr("height", CANVAS_HEIGHT)
+                          .css("width", CANVAS_WIDTH)
+                          .css("height", CANVAS_HEIGHT);
     });
 
     var inited=false;
@@ -158,9 +181,13 @@ $(function(){
                 players[i].moves=new Queue();
 
                 persistCanvas.save();
+                persistCanvasShadow.save();
                 persistCanvas.fillStyle=players[i].color[2];
-                persistCanvas.fillRect(players[i].ox*10, players[i].oy*10, 10, 10);
+                persistCanvasShadow.fillStyle=players[i].color[3];
+                persistCanvas.fillRect(players[i].ox*renderAmplification, players[i].oy*renderAmplification, renderAmplification, renderAmplification);
+                persistCanvasShadow.fillRect(players[i].ox*renderAmplification, players[i].oy*renderAmplification+3, renderAmplification, renderAmplification);
                 persistCanvas.restore();
+                persistCanvasShadow.restore();
 
                 if (obj._init!==true) map.Set(players[i].ox, players[i].oy, players[i].idnum);
             }
@@ -170,7 +197,6 @@ $(function(){
             }
         }
         if ("maprever" in obj) {
-            console.log(JSON.stringify(obj.maprever));
             map._ChangeColorRever(obj.maprever);
             renderPersistMapWhole();
         }
