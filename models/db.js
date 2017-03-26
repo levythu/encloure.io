@@ -32,9 +32,9 @@ exports.unregisterRoom = function(gameEndpoint) {
 exports.unregisterGameServer = function(serverEndpoint) {
     db.collection('gameServers').findOne({'endpoint':serverEndpoint}, function(err, doc) {
         for (var id in doc.roomIds) {
-            db.collection('rooms').remove({'gameEndpoint':id}, function(){});
+            db.collection('rooms').remove({'gameEndpoint':doc.roomIds[id]}, function(){});
         }
-    db.collection('gameServers').remove({'endpoint':serverEndpoint}, function(){});
+        db.collection('gameServers').remove({'endpoint':serverEndpoint}, function(){});
     });
 }
 

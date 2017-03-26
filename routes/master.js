@@ -30,7 +30,7 @@ router.post('/unregister', function(req, res) {
         res.status(403).send("Invalid secret.");
         return;
     }
-    db.deleteDoc('gameServers', {endpoint:req.body.endpoint});
+    db.unregisterGameServer(req.body.endpoint);
     delete list[req.body.endpoint];
     res.send("OK.");
 
