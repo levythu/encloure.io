@@ -181,7 +181,7 @@
             for (var i=singleRever.xmin; i<=singleRever.xmax; i++) {
                 var p=i*height;
                 for (var j=singleRever.ymin; j<=singleRever.ymax; j++) {
-                    if (map.c[i][j]==map.NO_OCCUPATION) blanks.push(p+j);
+                    if (map.c[i][j]==map.NO_OCCUPATION || (map.c[i][j]>=0 && map.c[i][j] % map.DIM_GAP!=colorId)) blanks.push(p+j);
                 }
             }
             while (true) {
@@ -222,7 +222,7 @@
                 var p=i*height;
                 for (var j=singleRever.ymin; j<=singleRever.ymax; j++) {
                     if (record[visitMap[p+j]]===true) {
-                        map.Set(i, j, numid);
+                        map.Set(i, j, colorId);
                     } else {
                         if (map.c[i][j]>=0) {
                             var numid=map.c[i][j]%map.DIM_GAP;
