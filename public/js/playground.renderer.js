@@ -23,6 +23,41 @@ $(function(){
     function fromNumIDtoID(numid) {
         return ""+numid;
     }
+
+    function renderScoreboard() {
+        var result=map.CollectEnclosure();
+        var sort=[];
+        for (var i=0; i<5; i++) {
+            var best=-1;
+            var colorid=-1;
+            for (var color in result) {
+                if (result[color]>best) {
+                    best=result[color];
+                    colorid=color;
+                }
+            }
+            if (colorid==-1) break;
+            else {
+                sort.push([colorid, best]);
+                delete result[colorid];
+            }
+        }
+        $("#scoreboard").css("visibility", "visible")
+                        .html("");
+        for (var i=0; i<sort.length; i++) {
+            var ratio=sort[i][1]/(globalConf.MapSize[0]*globalConf.MapSize[1]);
+            var relativeRatio=Math.floor(100*(sort[0][1]==0?1/sort.length:sort[i][1]/sort[0][1]));
+            var theplayer=players[sort[i][0]];
+            var newNode=$('<div class="scoreboardEntry"><span class="txt"></span></div>');
+            newNode.css("left", (100-relativeRatio)+"%")
+                   .css("width", relativeRatio+"%")
+                   .css("background-color", theplayer.color[0])
+                   .css("box-shadow", "0 7px 0 "+theplayer.color[3]);
+            newNode.find(".txt").text(theplayer.nick+" - "+Math.floor(ratio*1000)/10+"%");
+            $("#scoreboard").append(newNode);
+        }
+    }
+
     function renderPersistMapWhole(renderEmpty=false, xstart=0, xend=globalConf.MapSize[0]-1, ystart=0, yend=globalConf.MapSize[1]-1) {
         persistCanvas.save();
         persistCanvasShadow.save();
@@ -200,6 +235,7 @@ $(function(){
         if ("_init" in obj) {
             setInterval(renderFrame, 1000/globalConf.FPS);
             inited=true;
+            setInterval(renderScoreboard, 1000);
         }
         if (!inited) return;
         if ("join" in obj) {
