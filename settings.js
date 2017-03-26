@@ -3,7 +3,7 @@ module.exports={
     // before connecting to server.
     game: {
         FPS:        40,
-        RPS:        4,
+        RPS:        6,
         RPSLag:     1,      // the lag between client and server, typically the slowest speed
 
         defaultMap: {
@@ -18,16 +18,16 @@ module.exports={
 
     server: {
         // the public hostname, useful for both gameserver and master
-        hostname: "ec2-34-207-137-52.compute-1.amazonaws.com",
+        hostname: "aws.levy.at",
 
         // will be used only for gameserver, indicating where's the master
-        masterEndPoint: "http://ec2-34-207-137-52.compute-1.amazonaws.com:3000",
+        masterEndPoint: "http://aws.levy.at:3000",
         // useful for both server, gameserver use this to register on master
         masterSecret: "BingoLingo!",
     },
 
     database: {
-        url : "mongodb://localhost:27016/enclosure",
+        url : "mongodb://localhost:27017/enclosure",
     },
 
     // `pallet` describe the color pattern that will be used for display.
@@ -43,5 +43,10 @@ module.exports={
         ["#4caf50", "#a5d6a7", "#388e3c", "#1b5e20"],   // green
         ["#ffeb3b", "#fff59d", "#fbc02d", "#f57f17"],   // yellow
         ["#ff9800", "#ffcc80", "#f57c00", "#e65100"],   // orange
+        ["#e91e63", "#f48fb1", "#c2185b", "#880e4f"],   // pink
+        ["#673ab7", "#b39ddb", "#512da8", "#311b92"],   // deep purple
+        ["#009688", "#80cbc4", "#00796b", "#004d40"],   // teal
+        ["#cddc39", "#e6ee9c", "#afb42b", "#827717"],   // lime
+        ["#ff5722", "#ffab91", "#e64a19", "#bf360c"],   // deep oriange
     ],
 };
