@@ -13,16 +13,7 @@ router.post('/quickgame', function(req, res){
   // console.log(req.body.name);
   // var token = encodeURIComponent(randomGen.GenerateUUID(16));
   var token = encodeURIComponent(req.body.name);
-  res.redirect('playground#token='+token);
+  res.redirect('../playground#token='+token);
 });
 
-router.get('/playground', function(req, res){
-  res.sendFile('playground.html', {
-        root: './public/'
-    }, function(err) {
-        if (err) {
-            console.log(err);
-        }
-    });
-});
 exports.r = router;
