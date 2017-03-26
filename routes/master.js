@@ -5,6 +5,8 @@ var request=require("request");
 
 var conf=require("../settings");
 var Lock=require("../utils/lock");
+var db=require("../models/db");
+
 
 var list={};
 
@@ -15,6 +17,7 @@ router.post('/register', function(req, res) {
     }
     console.log("Registered: "+req.body.endpoint);
 
+    db.insertDoc('gameServers', {endpoint:req.body.endpoint, token:req.body.token, roomIds:[]});
     list[req.body.endpoint]=req.body.token;
     res.send("OK.");
 });
@@ -28,7 +31,7 @@ router.post('/unregister', function(req, res) {
         res.status(403).send("Invalid secret.");
         return;
     }
-
+    db.deleteDoc('gameServers', {endpoint:req.body.endpoint});
     delete list[req.body.endpoint];
     res.send("OK.");
 
@@ -40,35 +43,76 @@ router.post('/unregister', function(req, res) {
 
 router.get('/getserver', function(req, res) {
     mutex.Lock(function() {
-        if (theserverEndpoint==null) {
-            var availableServer=null;
-            for (var i in list) {
-                availableServer=i;
-                break;
-            }
-            if (availableServer==null) {
-                res.status(503).send("No gameserver available");
+        db.getRoom(function(room){
+            if (room == null) {
+                // create a new room
+                db.getServer(function(servers){
+                    if (servers == null) {
+                        res.status(503).send("No gameserver available");
+                        mutex.Unlock();
+                        return;
+                    }
+                    availableServer = servers[0].endpoint;
+                    request.post(availableServer+"/newserver", {form: {
+                        token: list[availableServer],
+                    }}, function(err, response, body) {
+                        if (err || Math.floor(response.statusCode/100)!==2) {
+                            mutex.Unlock();
+                            res.status(503).send("Game server fail to create server.");
+                            return;
+                        }
+                        theserverEndpoint=body;
+                        // add ws to db
+                        db.registerRoom(availableServer, body);
+                        res.send(theserverEndpoint);
+                        mutex.Unlock();
+                        return;
+                    });
+                });
+            } else {
+                // assign this room to user
+                db.updatePlayerNum(room.gameEndpoint, 1);
                 mutex.Unlock();
+                res.send(room.gameEndpoint);
                 return;
             }
-            request.post(availableServer+"/newserver", {form: {
-                token: list[availableServer],
-            }}, function(err, response, body) {
-                if (err || Math.floor(response.statusCode/100)!==2) {
-                    mutex.Unlock();
-                    res.status(503).send("Game server fail to create server.");
-                    return;
-                }
-                theserverEndpoint=body;
-                res.send(theserverEndpoint);
-                mutex.Unlock();
-                return;
-            });
-        } else {
-            mutex.Unlock();
-            res.send(theserverEndpoint);
-            return;
-        }
+
+        });
+
+        // if (theserverEndpoint==null) {
+        //     var availableServer=null;
+        //     for (var i in list) {
+        //         availableServer=i;
+        //         break;
+        //     }
+        //     if (availableServer==null) {
+        //         res.status(503).send("No gameserver available");
+        //         mutex.Unlock();
+        //         return;
+        //     }
+        //     request.post(availableServer+"/newserver", {form: {
+        //         token: list[availableServer],
+        //     }}, function(err, response, body) {
+        //         if (err || Math.floor(response.statusCode/100)!==2) {
+        //             mutex.Unlock();
+        //             res.status(503).send("Game server fail to create server.");
+        //             return;
+        //         }
+        //         theserverEndpoint=body;
+        //
+        //         // add ws to db
+        //         db.registerRoom(availableServer, body);
+        //
+        //         res.send(theserverEndpoint);
+        //         mutex.Unlock();
+        //         return;
+        //     });
+        // } else {
+        //     db.updatePlayerNum(theserverEndpoint, 1);
+        //     mutex.Unlock();
+        //     res.send(theserverEndpoint);
+        //     return;
+        // }
     });
 });
 

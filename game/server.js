@@ -1,6 +1,7 @@
 var conf=require("../settings");
 var game=require("./game");
 var WebSocket=require("ws");
+var db=require("../models/db");
 
 function NewServer(callback, gameConf=conf.game.defaultMap) {
     var count=0;
@@ -38,7 +39,9 @@ function NewServer(callback, gameConf=conf.game.defaultMap) {
         g.onControl(client.profile.id, obj);
     }
     server.onDisconnect=function(client) {
-
+        // decrease the active player number in db
+        var gameEndpoint = "ws://"+client.ws.upgradeReq.headers.host;
+        db.updatePlayerNum(gameEndpoint, -1);
     }
 
     var wss = new WebSocket.Server({ port: 0 }, function() {
