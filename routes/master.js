@@ -17,7 +17,7 @@ router.post('/register', function(req, res) {
     }
     console.log("Registered: "+req.body.endpoint);
 
-    db.insertDoc('gameServers', {endpoint:req.body.endpoint, token:req.body.token}, function(){});
+    db.insertDoc('gameServers', {endpoint:req.body.endpoint, token:req.body.token, roomIds:[]});
     list[req.body.endpoint]=req.body.token;
     res.send("OK.");
 });
@@ -31,7 +31,7 @@ router.post('/unregister', function(req, res) {
         res.status(403).send("Invalid secret.");
         return;
     }
-    db.deleteDoc('gameServers', {endpoint:req.body.endpoint}, function(){});
+    db.deleteDoc('gameServers', {endpoint:req.body.endpoint});
     delete list[req.body.endpoint];
     res.send("OK.");
 
@@ -63,6 +63,10 @@ router.get('/getserver', function(req, res) {
                     return;
                 }
                 theserverEndpoint=body;
+
+                // add ws to db
+                db.registerRoom(availableServer, body);
+
                 res.send(theserverEndpoint);
                 mutex.Unlock();
                 return;
