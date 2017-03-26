@@ -4,6 +4,7 @@ var mp;
 $(function(){
     var Queue=window._extension.Queue;
     var renderAmplification=30;
+    var marginForCanvas=50;
 
     var mainCanvas=$("#mainCanvas")[0].getContext("2d");
     var persistCanvas=$("#persistCanvas")[0].getContext("2d");
@@ -31,18 +32,20 @@ $(function(){
                     var id=fromNumIDtoID(map.c[i][j] % map.DIM_GAP);
                     var dim=Math.floor(map.c[i][j] / map.DIM_GAP);
                     if (id in players) {
-                        persistCanvas.fillStyle=players[id].color[dim==0?2:1];
-                        persistCanvas.fillRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
                         if (dim==0) {
+                            persistCanvas.fillStyle=players[id].color[2];
+                            persistCanvas.fillRect(i*renderAmplification, j*renderAmplification-6, renderAmplification, renderAmplification);
                             persistCanvasShadow.fillStyle=players[id].color[3];
-                            persistCanvasShadow.fillRect(i*renderAmplification, j*renderAmplification+3, renderAmplification, renderAmplification);
+                            persistCanvasShadow.fillRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
                         } else {
-                            persistCanvasShadow.clearRect(i*renderAmplification, j*renderAmplification+3, renderAmplification, renderAmplification);
+                            persistCanvas.clearRect(i*renderAmplification, j*renderAmplification-6, renderAmplification, renderAmplification);
+                            persistCanvasShadow.fillStyle=players[id].color[1];
+                            persistCanvasShadow.fillRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
                         }
                     }
                 } else if (renderEmpty) {
-                    persistCanvas.clearRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
-                    persistCanvasShadow.clearRect(i*renderAmplification, j*renderAmplification+3, renderAmplification, renderAmplification);
+                    persistCanvas.clearRect(i*renderAmplification, j*renderAmplification-6, renderAmplification, renderAmplification);
+                    persistCanvasShadow.clearRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
                 }
             }
         }
@@ -51,15 +54,16 @@ $(function(){
     }
     function digestMove(mv, persistWholeRenderRequired=true, now=null) {
         if (now==null) now=(new Date()).getTime();
-        persistCanvas.save();
+        persistCanvasShadow.save();
         for (var i in mv) {
             var player=players[i];
             if (player==null) continue;
 
             var v=map.c[mv[i].x][mv[i].y];
             if (v==map.NO_OCCUPATION) {
-                persistCanvas.fillStyle=player.color[1];
-                persistCanvas.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
+                persistCanvas.clearRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification-6, renderAmplification, renderAmplification);
+                persistCanvasShadow.fillStyle=player.color[1];
+                persistCanvasShadow.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
                 map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
             } else if (v>=map.DIM_GAP && v<map.DIM_GAP*2) {
                 var victim=v-map.DIM_GAP;
@@ -67,8 +71,9 @@ $(function(){
                     map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
                 }
             } else if (v<map.DIM_GAP) {
-                persistCanvas.fillStyle=player.color[1];
-                persistCanvas.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
+                persistCanvas.clearRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification-6, renderAmplification, renderAmplification);
+                persistCanvasShadow.fillStyle=player.color[1];
+                persistCanvasShadow.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
 
                 map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
             }
@@ -89,7 +94,7 @@ $(function(){
             }
 
         }
-        persistCanvas.restore();
+        persistCanvasShadow.restore();
 
         var wantRender=false;
         var hasDelete=false;
@@ -117,8 +122,13 @@ $(function(){
     function adjustZoom(posInCanvasToCenter/*[x, y]*/) {
         var width=$("#container").width();
         var height=$("#container").height();
-        $(".movingCanvas").css("left", width/2-posInCanvasToCenter[0]);
-        $(".movingCanvas").css("top", height/2-posInCanvasToCenter[1]);
+        var basex=width/2-posInCanvasToCenter[0];
+        var basey=height/2-posInCanvasToCenter[1];
+        $(".movingCanvas").css("left", basex)
+                          .css("top", basey);
+
+        $("#mainCanvas").css("left", basex-marginForCanvas)
+                        .css("top", basey-marginForCanvas);
     }
 
     function renderFrame() {
@@ -136,13 +146,19 @@ $(function(){
         }
 
         mainCanvas.save();
-        mainCanvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        mainCanvas.clearRect(0, 0, CANVAS_WIDTH+2*marginForCanvas, CANVAS_HEIGHT+2*marginForCanvas);
         for (var i in players) {
             var player=players[i];
             mainCanvas.fillStyle=player.color[2];
-            mainCanvas.fillRect(player.x*renderAmplification, player.y*renderAmplification+3, renderAmplification, renderAmplification);
+            mainCanvas.fillRect(player.x*renderAmplification+marginForCanvas,
+                                player.y*renderAmplification+marginForCanvas,
+                                renderAmplification,
+                                renderAmplification);
             mainCanvas.fillStyle=player.color[0];
-            mainCanvas.fillRect(player.x*renderAmplification, player.y*renderAmplification, renderAmplification, renderAmplification);
+            mainCanvas.fillRect(player.x*renderAmplification+marginForCanvas,
+                                (player.y*renderAmplification-6+marginForCanvas),
+                                renderAmplification,
+                                renderAmplification);
         }
         for (var i in players) {
             var player=players[i];
@@ -150,9 +166,7 @@ $(function(){
             mainCanvas.font="17px Helvetica";
             mainCanvas.fillStyle=player.color[3];
             var basex=player.x*renderAmplification+renderAmplification/2;
-            mainCanvas.fillText(player.nick, basex, player.y*renderAmplification-2);
-            mainCanvas.fillStyle=player.color[0];
-            mainCanvas.fillText(player.nick, basex, player.y*renderAmplification-3);
+            mainCanvas.fillText(player.nick, basex+marginForCanvas, (player.y*renderAmplification-14)+marginForCanvas);
         }
         mainCanvas.restore();
 
@@ -162,16 +176,21 @@ $(function(){
     }
 
     $("body").on("gm-init", function() {
-        CANVAS_WIDTH=globalConf.MapSize[0]*30;
-        CANVAS_HEIGHT=globalConf.MapSize[1]*30;
+        CANVAS_WIDTH=globalConf.MapSize[0]*renderAmplification;
+        CANVAS_HEIGHT=globalConf.MapSize[1]*renderAmplification;
         map=window._extension.NewMap(globalConf.MapSize[0], globalConf.MapSize[1]);
         mp=map;
         $(".kernelCanvas").attr("width",  CANVAS_WIDTH)
                           .attr("height", CANVAS_HEIGHT)
                           .css("width", CANVAS_WIDTH)
                           .css("height", CANVAS_HEIGHT);
-        if (globalConf.profile._fail===true) {
-            alert("The room is dominated by someone!");
+        $("#mainCanvas").attr("width",  CANVAS_WIDTH+2*marginForCanvas)
+                        .attr("height", CANVAS_HEIGHT+2*marginForCanvas)
+                        .css("width", CANVAS_WIDTH+2*marginForCanvas)
+                        .css("height", CANVAS_HEIGHT+2*marginForCanvas);
+        if (typeof(globalConf.profile._fail)=="string") {
+            N.close();
+            alert(globalConf.profile._fail);
         }
     });
 

@@ -48,14 +48,22 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
 
     game.position={};
     game.map=Map(gameConf.MapSize[0], gameConf.MapSize[1]);
+    game.userOnline=0;
     // id is a string and playerProfile is its profile to be initialized
     game.JoinNewPlayer=function(id, playerProfile) {
+        if (game.userOnline>=gameConf.MaxPlayer) {
+            playerProfile._fail="Sadly, the room is full :(";
+            return;
+        }
+
         var resTuple=game.map.FindSpawnPlace();
         if (resTuple==null) {
             // no place to spawn
-            playerProfile._fail=true;
+            playerProfile._fail="The room is dominated and there's no place to spawn!";
             return;
         }
+        game.userOnline++;
+
         player[id]=playerProfile;
         playerProfile.x=resTuple[0];
         playerProfile.y=resTuple[1];
@@ -153,6 +161,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         for (var i in die) {
             game.map.DeleteColor(-(-i));
             delete player[i];
+            game.userOnline--;
         }
         for (var i in floodList) {
             game.map.FloodFill(i);

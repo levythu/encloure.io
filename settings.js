@@ -7,7 +7,7 @@ module.exports={
         RPSLag:     1,      // the lag between client and server, typically the slowest speed
 
         defaultMap: {
-            MapSize:    [100, 100], // default map size
+            MapSize:    [80, 80], // default map size
             MaxPlayer:  20,
         },
 
