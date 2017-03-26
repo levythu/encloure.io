@@ -185,8 +185,9 @@ $(function(){
                         .attr("height", CANVAS_HEIGHT+2*marginForCanvas)
                         .css("width", CANVAS_WIDTH+2*marginForCanvas)
                         .css("height", CANVAS_HEIGHT+2*marginForCanvas);
-        if (globalConf.profile._fail===true) {
-            alert("The room is dominated by someone!");
+        if (typeof(globalConf.profile._fail)=="string") {
+            N.close();
+            alert(globalConf.profile._fail);
         }
     });
 
