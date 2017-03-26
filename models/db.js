@@ -3,7 +3,7 @@ var conf=require("../settings");
 var url = conf.database.url;
 
 var mongojs = require('mongojs');
-var db = mongojs(url, ['gamerServers']);
+var db = mongojs(url, ['gameServers', 'rooms']);
 
 exports.insertDoc = function(collectionName, doc) {
     db.collection(collectionName).insert(doc, function(){});
@@ -14,25 +14,51 @@ exports.deleteDoc = function(collectionName, doc) {
 };
 
 exports.registerRoom = function(serverEndpoint, gameEndpoint) {
-    db.collection('gamerServers').update({endpoint:serverEndpoint},
+    db.collection('gameServers').update({endpoint:serverEndpoint},
         {$push: { roomIds: gameEndpoint }}, {multi: false}, function (){});
-    insertDoc('rooms', {'serverEndpoint':serverEndpoint, 'gameEndpoint':gameEndpoint});
+    //TODO: hardcode max players
+    db.collection('rooms').insert({'serverEndpoint':serverEndpoint,
+    'gameEndpoint':gameEndpoint, maxPlayers:20, activePlayers:1}, function(){});
 }
 
-exports.unRegisterRoom = function(gameEndpoint) {
+exports.unregisterRoom = function(gameEndpoint) {
     db.collection('rooms').findOne({'gameEndpoint':gameEndpoint}, function(err, doc) {
-        db.collection('gamerServers').update({endpoint:doc.serverEndpoint},
+        db.collection('gameServers').update({endpoint:doc.serverEndpoint},
             {$pull: { roomIds: gameEndpoint }}, {multi: false}, function (){});
-        deleteDoc('rooms', doc);
+        db.collection('rooms').remove(doc, function(){});
     });
-
 }
 
-exports.unRegisterGameServer = function(serverEndpoint) {
-    db.collection('gamerServers').findOne({'endpoint':serverEndpoint}, function(err, doc) {
-        for (var id : doc.roomIds) {
-            deleteDoc('rooms', {'gameEndpoint':id});
+exports.unregisterGameServer = function(serverEndpoint) {
+    db.collection('gameServers').findOne({'endpoint':serverEndpoint}, function(err, doc) {
+        for (var id in doc.roomIds) {
+            db.collection('rooms').remove({'gameEndpoint':id}, function(){});
         }
-        deleteDoc('gameServers', {'endpoint':serverEndpoint});
-    }); 
+    db.collection('gameServers').remove({'endpoint':serverEndpoint}, function(){});
+    });
+}
+
+exports.updatePlayerNum = function(gameEndpoint, num) {
+    db.collection('rooms').update({'gameEndpoint': gameEndpoint}, {$inc: { activePlayers: num }}, {multi: false}, function (){});
+}
+
+exports.getRoom = function(callback) {
+    db.collection('rooms').findOne({$where: "this.activePlayers < this.maxPlayers"}, function(err, doc){
+        callback(doc);
+    });
+}
+
+exports.getServer = function(callback) {
+    db.collection('gameServers').aggregate(
+        [
+          {
+             $project: {
+                endpoint: 1,
+                numberOfRooms: { $size: "$roomIds" }
+             }
+          }
+        ]
+    ).sort({numberOfRooms:1}, function(err, docs) {
+        callback(docs);
+    });
 }
