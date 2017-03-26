@@ -23,7 +23,6 @@ router.post('/register', function(req, res) {
 });
 
 // this is a temp behavior
-var theserverEndpoint=null;
 var mutex=new Lock();
 router.post('/unregister', function(req, res) {
     console.log(req.body);
@@ -35,10 +34,6 @@ router.post('/unregister', function(req, res) {
     delete list[req.body.endpoint];
     res.send("OK.");
 
-    mutex.Lock(function() {
-        theserverEndpoint=null;
-        mutex.Unlock();
-    });
 });
 
 router.get('/getserver', function(req, res) {
@@ -61,10 +56,9 @@ router.get('/getserver', function(req, res) {
                             res.status(503).send("Game server fail to create server.");
                             return;
                         }
-                        theserverEndpoint=body;
                         // add ws to db
                         db.registerRoom(availableServer, body);
-                        res.send(theserverEndpoint);
+                        res.send(body);
                         mutex.Unlock();
                         return;
                     });
@@ -78,41 +72,18 @@ router.get('/getserver', function(req, res) {
             }
 
         });
+    });
+});
 
-        // if (theserverEndpoint==null) {
-        //     var availableServer=null;
-        //     for (var i in list) {
-        //         availableServer=i;
-        //         break;
-        //     }
-        //     if (availableServer==null) {
-        //         res.status(503).send("No gameserver available");
-        //         mutex.Unlock();
-        //         return;
-        //     }
-        //     request.post(availableServer+"/newserver", {form: {
-        //         token: list[availableServer],
-        //     }}, function(err, response, body) {
-        //         if (err || Math.floor(response.statusCode/100)!==2) {
-        //             mutex.Unlock();
-        //             res.status(503).send("Game server fail to create server.");
-        //             return;
-        //         }
-        //         theserverEndpoint=body;
-        //
-        //         // add ws to db
-        //         db.registerRoom(availableServer, body);
-        //
-        //         res.send(theserverEndpoint);
-        //         mutex.Unlock();
-        //         return;
-        //     });
-        // } else {
-        //     db.updatePlayerNum(theserverEndpoint, 1);
-        //     mutex.Unlock();
-        //     res.send(theserverEndpoint);
-        //     return;
-        // }
+router.post('/unregisterRoom', function(req, res){
+    mutex.Lock(function() {
+        console.log(req.body);
+        if (req.body.secret!==conf.server.masterSecret) {
+            res.status(403).send("Invalid secret.");
+            return;
+        }
+        db.unregisterRoom(req.body.gameEndpoint);
+        mutex.Unlock();
     });
 });
 
