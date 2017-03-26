@@ -52,6 +52,7 @@ $(function(){
             newNode.css("left", (100-relativeRatio)+"%")
                    .css("width", relativeRatio+"%")
                    .css("background-color", theplayer.color[0])
+                   .css("color", theplayer.color[4])
                    .css("box-shadow", "0 7px 0 "+theplayer.color[3]);
             newNode.find(".txt").text(theplayer.nick+" - "+Math.floor(ratio*1000)/10+"%");
             $("#scoreboard").append(newNode);
