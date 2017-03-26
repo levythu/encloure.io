@@ -9,11 +9,12 @@
 #mainCanvas,
 #persistCanvas {
     background-color: transparent;
+    border: solid 16px transparent;
 }
 
 #persistCanvasShadow {
-    background-color: #efefef;
-    box-shadow: 0px 100px 0px #ccc;
+    background-color: #cfd8dc;
+    border: solid 16px #607d8b;
 }
 
 #container {

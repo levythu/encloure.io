@@ -38,6 +38,7 @@ $(function(){
                             persistCanvasShadow.fillStyle=players[id].color[3];
                             persistCanvasShadow.fillRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
                         } else {
+                            persistCanvas.clearRect(i*renderAmplification, j*renderAmplification-6, renderAmplification, renderAmplification);
                             persistCanvasShadow.fillStyle=players[id].color[1];
                             persistCanvasShadow.fillRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
                         }
@@ -60,6 +61,7 @@ $(function(){
 
             var v=map.c[mv[i].x][mv[i].y];
             if (v==map.NO_OCCUPATION) {
+                persistCanvas.clearRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification-6, renderAmplification, renderAmplification);
                 persistCanvasShadow.fillStyle=player.color[1];
                 persistCanvasShadow.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
                 map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
@@ -69,6 +71,7 @@ $(function(){
                     map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
                 }
             } else if (v<map.DIM_GAP) {
+                persistCanvas.clearRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification-6, renderAmplification, renderAmplification);
                 persistCanvasShadow.fillStyle=player.color[1];
                 persistCanvasShadow.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
 
