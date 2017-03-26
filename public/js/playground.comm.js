@@ -8,13 +8,13 @@ var N={};
 $(function(){
     var params={};
     function parseHash() {
-        params={}
+        params={};
         var hash=window.location.hash.substring(1);
-        var params=hash.split('&');
-        for (var i=0; i<params.length; i++) {
-            var kv=params[i].split('=');
-            var k=decodeURIComponent(pair[0]);
-            var v=decodeURIComponent(pair[1]);
+        var tp=hash.split('&');
+        for (var i=0; i<tp.length; i++) {
+            var kv=tp[i].split('=');
+            var k=decodeURIComponent(kv[0]);
+            var v=decodeURIComponent(kv[1]);
             params[k]=v;
         }
     }
@@ -32,6 +32,7 @@ $(function(){
         return result;
     }
     function findOneRoom() {
+        console.log("Finding rooms...")
         $.get("/gm/getserver", function(data) {
             params.endpoint=data;
             window.location.hash=generateHash();
@@ -51,6 +52,9 @@ $(function(){
 
         connection.onopen = function() {
             hasInitiated=false;
+            var toPost={_init: true};
+            toPost.token=params.token;
+            connection.send(JSON.stringify(toPost));
         };
 
         connection.onerror = function(error) {
@@ -95,8 +99,10 @@ $(function(){
             }
         }
     }
-
+    parseHash();
     if (params.endpoint==null) {
         findOneRoom();
+    } else {
+        connectTo(params.endpoint);
     }
 });
