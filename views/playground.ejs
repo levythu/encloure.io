@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="/css/playground.layout.css" rel='stylesheet' type='text/css'>
+
+    <title>Enclosure.io</title>
+
+    <script type="text/javascript" src="/js/jquery/jquery-1.11.1.min.js"></script>
+
+    <script type="text/javascript" src="/js/map.duo.js"></script>
+    <script type="text/javascript" src="/js/utils/queue.js"></script>
+
+    <script type="text/javascript" src="/js/playground.comm.js"></script>
+    <script type="text/javascript" src="/js/playground.event.js"></script>
+    <script type="text/javascript" src="/js/playground.renderer.js"></script>
+</head>
+<body>
+<form>
+  <input type="hidden" name="username" value="<%= name %>">
+</form>
+    <div id="container">
+        <canvas id="persistCanvasShadow" class="maxSize kernelCanvas movingCanvas"></canvas>
+        <canvas id="persistCanvas" class="maxSize kernelCanvas movingCanvas"></canvas>
+        <canvas id="mainCanvas" class="maxSize kernelCanvas movingCanvas"></canvas>
+    </div>
+</body>
+
+</html>
+
