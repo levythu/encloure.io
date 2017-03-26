@@ -42,11 +42,12 @@ router.get('/getserver', function(req, res) {
             if (room == null) {
                 // create a new room
                 db.getServer(function(servers){
-                    if (servers == null) {
+                    if (servers.length == 0) {
                         res.status(503).send("No gameserver available");
                         mutex.Unlock();
                         return;
                     }
+                    console.log(servers);
                     availableServer = servers[0].endpoint;
                     request.post(availableServer+"/newserver", {form: {
                         token: list[availableServer],
@@ -65,7 +66,6 @@ router.get('/getserver', function(req, res) {
                 });
             } else {
                 // assign this room to user
-                db.updatePlayerNum(room.gameEndpoint, 1);
                 mutex.Unlock();
                 res.send(room.gameEndpoint);
                 return;
@@ -80,9 +80,23 @@ router.post('/unregisterRoom', function(req, res){
         console.log(req.body);
         if (req.body.secret!==conf.server.masterSecret) {
             res.status(403).send("Invalid secret.");
+            mutex.Unlock();
             return;
         }
         db.unregisterRoom(req.body.gameEndpoint);
+        mutex.Unlock();
+    });
+});
+
+router.post('/updatePlayerNum', function(req, res) {
+    mutex.Lock(function() {
+        console.log(req.body);
+        if (req.body.secret!==conf.server.masterSecret) {
+            res.status(403).send("Invalid secret.");
+            mutex.Unlock();
+            return;
+        }
+        db.updatePlayerNum(req.body.gameEndpoint, req.body.num);
         mutex.Unlock();
     });
 });
