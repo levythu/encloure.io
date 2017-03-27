@@ -33,6 +33,7 @@ function NewServer(callback, gameConf=conf.game.defaultMap) {
         var obj;
         try {
             obj=JSON.parse(message);
+            if (obj._init===true) return;
         } catch (e) {
             return;
         }
@@ -42,32 +43,55 @@ function NewServer(callback, gameConf=conf.game.defaultMap) {
         //TODO tell master to update player number
     }
 
+    function waitForValidation(message, succ, fail) {
+        var obj;
+        try {
+            obj=JSON.parse(message);
+            succ({
+                nick: obj.token,
+            });
+        } catch (e) {
+            fail();
+        }
+    }
     var wss = new WebSocket.Server({ port: 0 }, function() {
         callback("ws://"+conf.server.hostname+":"+wss._server.address().port);
     });
     wss.on('connection', function(ws) {
-        var thisCount=""+(count++);
-        console.log("Client #"+thisCount+" connects.");
+        ws.once("message", function(msg) {
+            waitForValidation(msg, function(profile) {
+                var thisCount=""+(count++);
+                console.log("Client #"+thisCount+" connects.");
 
-        var client={
-            ws: ws,
-            ready:   false,
-            msgPend: [],
-            profile: {
-                id: thisCount,
-            },
-        };
-        clients[thisCount]=client;
-        ws.on("message", function(msg) {
-            // console.log(msg);
-            server.onMessage(client, msg);
+                var client={
+                    ws: ws,
+                    ready:   false,
+                    msgPend: [],
+                    profile: {
+                        id: thisCount,
+                        nick: profile.nick,
+                    },
+                };
+                clients[thisCount]=client;
+
+                ws.on("message", function(msg) {
+                    // console.log(msg);
+                    server.onMessage(client, msg);
+                });
+                ws.on("close", function(msg) {
+                    console.log("Client #"+thisCount+" disconnects.");
+                    server.onDisconnect(client);
+                    delete clients[thisCount];
+                });
+                server.onConnect(client);
+            }, function() {
+                try {
+                    ws.close();
+                } catch (e) {
+                    console.error(e);
+                }
+            });
         });
-        ws.on("close", function(msg) {
-            console.log("Client #"+thisCount+" disconnects.");
-            server.onDisconnect(client);
-            delete clients[thisCount];
-        });
-        server.onConnect(client);
     });
     // obj is a js-object
     server.Broadcast=function(obj) {

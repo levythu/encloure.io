@@ -71,7 +71,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         playerProfile.color=PALLET[colorChoosen];
         playerProfile.speed=conf.game.player.speed;
         playerProfile.shouldMove=playerProfile.speed;
-        playerProfile.nick=getname();
+        if (playerProfile.nick==null) playerProfile.nick=getname();
         colorChoosen=(colorChoosen+1)%PALLET.length;
 
         game.map.SpawnNew(playerProfile.x, playerProfile.y, -(-id));

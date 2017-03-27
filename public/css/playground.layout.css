@@ -26,3 +26,33 @@
     overflow: hidden;
     background-color: #eceff1;
 }
+
+#scoreboard {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 20%;
+    height: 200px;
+    visibility: hidden;
+}
+
+.scoreboardEntry .txt {
+    white-space: nowrap;
+    display: inline-block;
+    left: 5px;
+    position: relative;
+}
+.scoreboardEntry {
+    height: 20px;
+    margin-top: 15px;
+    background-color: #f44336;
+    width: 50%;
+    position: relative;
+    left: 50%;
+    box-shadow: 0 7px 0 #b71c1c;
+    overflow: visible;
+    padding-top: 5px;
+    color: white;
+    font-size: 11px;
+    text-align: left;
+}

@@ -38,6 +38,18 @@
         }
         // membership functions
 
+        map.CollectEnclosure=function() {
+            var result={};
+            for (var i in colorRever) {
+                result[i]=0;
+                for (var e in colorRever[i].elems) {
+                    if (colorRever[i].elems[e]%1==0)
+                        result[i]++;
+                }
+            }
+            return result;
+        }
+
         map._ChangeColorRever=function(newRever) {
             colorRever=newRever;
             map._r=colorRever;
