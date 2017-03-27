@@ -8,6 +8,7 @@ var CONTROL_DIR={
     "l":    [-1, 0],
     "r":    [1 , 0],
 }
+var STAND_STILL=[0, 0];
 var CONTRADICT_DIR={
     "u":    "d",
     "d":    "u",
@@ -67,7 +68,8 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         player[id]=playerProfile;
         playerProfile.x=resTuple[0];
         playerProfile.y=resTuple[1];
-        playerProfile.d=CONTROL_DIR.r;
+        playerProfile.d=STAND_STILL;
+        playerProfile.standFrame=conf.game.player.standingFrame;
         playerProfile.color=PALLET[colorChoosen];
         playerProfile.speed=conf.game.player.speed;
         playerProfile.shouldMove=playerProfile.speed;
@@ -109,6 +111,11 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         var die={};
         for (i in player) {
             var prof=player[i];
+            if (prof.d===STAND_STILL && prof.standFrame<=0) {
+                prof.d=CONTROL_DIR.r;
+            } else if (prof.standFrame>0) {
+                prof.standFrame--;
+            }
 
             prof.shouldMove--;
             if (prof.shouldMove>0) continue;
