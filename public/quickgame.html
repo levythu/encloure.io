@@ -28,19 +28,11 @@
 
     <div class="row" style="margin-top: 60px;">
         <div class="col-md-4 col-md-offset-4">
-            <div class="panel-heading">
-                <h1 class="panel-title">Log In</h1>
-            </div>
             <div class="panel-body">
-
-                <form class="form-signin" method="post" action="/TODO">
-                    <label>Email</label>
-                    <input class="form-control" maxlength="20" name="Email" type="text" required />
-
-                    <label style="margin-top: 15px;">Password</label>
-                    <input class="form-control" maxlength="200" name="password" type="password" required />
-
-                    <input type="submit" class="btn btn-default btn-block" style="margin-top: 40px;background-color:#A9A9A9;active-color:#000000;" value="Login" />
+                <form method="post" action="/user/quickgame">
+                    <label>Your name: </label>
+                    <input type="text" class="form-control" maxlength="20" name="name" required/>
+                    <input type="submit" class="btn btn-default btn-block" style="margin-top: 40px;background-color:#A9A9A9;active-color:#000000;" value="Quick Game">
                 </form>
             </div>
         </div>
