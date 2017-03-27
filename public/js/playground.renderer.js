@@ -60,7 +60,7 @@ $(function(){
         }
     }
 
-    function renderPersistMapWhole(renderEmpty=false, xstart=0, xend=globalConf.MapSize[0]-1, ystart=0, yend=globalConf.MapSize[1]-1) {
+    function renderPersistMapWhole(renderEmpty=false, xstart=0, xend=globalConf.MapSize[0]-1, ystart=0, yend=globalConf.MapSize[1]-1, renderObstacle=false) {
         persistCanvas.save();
         persistCanvasShadow.save();
         for (var i=xstart; i<=xend; i++) {
@@ -80,9 +80,14 @@ $(function(){
                             persistCanvasShadow.fillRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
                         }
                     }
-                } else if (renderEmpty) {
+                } else if (map.c[i][j]==map.NO_OCCUPATION && renderEmpty) {
                     persistCanvas.clearRect(i*renderAmplification, j*renderAmplification-6, renderAmplification, renderAmplification);
                     persistCanvasShadow.clearRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
+                } else if (map.c[i][j]<=map.HARD_OBSTACLE && renderObstacle) {
+                    persistCanvas.fillStyle="#424242";
+                    persistCanvas.fillRect(i*renderAmplification, j*renderAmplification-6, renderAmplification, renderAmplification);
+                    persistCanvasShadow.fillStyle="#212121";
+                    persistCanvasShadow.fillRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
                 }
             }
         }
@@ -107,7 +112,7 @@ $(function(){
                 if (victim!=player.idnum) {
                     map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
                 }
-            } else if (v<map.DIM_GAP && v!=player.idnum) {
+            } else if (v>=0 && v<map.DIM_GAP && v!=player.idnum) {
                 persistCanvas.clearRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification-6, renderAmplification, renderAmplification);
                 persistCanvasShadow.fillStyle=player.color[1];
                 persistCanvasShadow.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
@@ -264,10 +269,16 @@ $(function(){
                 startLocalEpic=now;
             }
         }
+        var needRender=false;
         if ("maprever" in obj) {
             map._ChangeColorRever(obj.maprever);
-            renderPersistMapWhole();
+            needRender=true;
         }
+        if (obj.map!=null) {
+            map.DigestObstacleMap(obj.map);
+            needRender=true;
+        }
+        if (needRender) renderPersistMapWhole(false, 0, globalConf.MapSize[0]-1, 0, globalConf.MapSize[1]-1, true);
         if ("die" in obj) {
             obj.move._die=obj.die;
         }

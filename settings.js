@@ -9,6 +9,7 @@ module.exports={
         defaultMap: {
             MapSize:        [80, 80], // default map size
             MaxPlayer:      20,
+            map: require("./game/exampleMap.circle"),
         },
 
         player:     {

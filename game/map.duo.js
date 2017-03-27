@@ -13,6 +13,9 @@
         NO_OCCUPATION: -1,  // used to set a cell for empty
         NOT_DECIDED: -100,  // not used outside
 
+        HARD_OBSTACLE: -100000, // hard obstacle cannot be used as an edge of enclosure
+        SOFT_OBSTACLE: -100001, // while soft can
+
          // i+DIM_GAP*k is treated all as player i. To be precise, i is the enclosed
          // district, i+DIM_GAP is the un enclosed trailing, the further numbers
          // are reserved.
@@ -38,6 +41,14 @@
         }
         // membership functions
 
+        map.DigestObstacleMap=function(obmap) {
+            for (var i=0; i<width; i++) {
+                for (var j=0; j<height; j++) {
+                    if (obmap[i][j]==="1") map.Set(i, j, map.HARD_OBSTACLE);
+                    else if (obmap[i][j]==="2") map.Set(i, j, map.SOFT_OBSTACLE);
+                }
+            }
+        };
         map.CollectEnclosure=function() {
             var result={};
             for (var i in colorRever) {
@@ -232,7 +243,7 @@
                             var tx=src[0]+cros[i][0];
                             var ty=src[1]+cros[i][1];
                             if (tx<singleRever.xmin || ty<singleRever.ymin || tx>singleRever.xmax || ty>singleRever.ymax ||
-                                (map.c[tx][ty] in record)) {
+                                (map.c[tx][ty] in record) || map.c[tx][ty]===map.HARD_OBSTACLE) {
                                 record[round]=false;
                                 stack.length=0;
                                 break;

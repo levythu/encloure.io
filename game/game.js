@@ -49,6 +49,9 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
 
     game.position={};
     game.map=Map(gameConf.MapSize[0], gameConf.MapSize[1]);
+    if ("map" in gameConf) {
+        game.map.DigestObstacleMap(gameConf.map);
+    }
     game.userOnline=0;
     // id is a string and playerProfile is its profile to be initialized
     game.JoinNewPlayer=function(id, playerProfile) {
@@ -88,6 +91,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         server.Send(id, {
             join: player,
             maprever: game.map._r,
+            map: ("map" in gameConf?gameConf.map:null),
             _init: true,
             _epic: now,
         });
@@ -164,8 +168,10 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
                 } else if (victim!=idnum) {
                     game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
                 }
-            } else if (v<game.map.DIM_GAP) {
+            } else if (v>=0 && v<game.map.DIM_GAP) {
                 game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+            } else if (v==game.map.SOFT_OBSTACLE || v==game.map.HARD_OBSTACLE) {
+                die[i]=true;
             }
 
             prof.lastMoveTime=now;
