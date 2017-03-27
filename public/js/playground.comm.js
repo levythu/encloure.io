@@ -12,6 +12,7 @@ $(function(){
         var hash=window.location.hash.substring(1);
         var tp=hash.split('&');
         for (var i=0; i<tp.length; i++) {
+            if (tp[i]==0) continue;
             var kv=tp[i].split('=');
             var k=decodeURIComponent(kv[0]);
             var v=decodeURIComponent(kv[1]);

@@ -49,6 +49,7 @@ $(function(){
             var relativeRatio=Math.floor(100*(sort[0][1]==0?1/sort.length:sort[i][1]/sort[0][1]));
             var theplayer=players[sort[i][0]];
             var newNode=$('<div class="scoreboardEntry"><span class="txt"></span></div>');
+            if (relativeRatio<10) relativeRatio=10;
             newNode.css("left", (100-relativeRatio)+"%")
                    .css("width", relativeRatio+"%")
                    .css("background-color", theplayer.color[0])
