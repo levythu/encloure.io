@@ -15,6 +15,18 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// authentication functions. Not sure what these mean.
+app.use(function(req, res, next) {
+  if (req.url === '/secure' && (!req.session || !req.session.authenticated)) {
+    // res.render('unauthorised', { status: 403 });
+    res.render('home', { status: 403 });
+    return;
+  }
+
+  next();
+});
+app.use(express.session({ secret: conf.server.masterSecret }));
+
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
