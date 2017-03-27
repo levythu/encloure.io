@@ -33,6 +33,7 @@
     top: 0;
     width: 20%;
     height: 200px;
+    overflow-x: hidden;
     visibility: hidden;
 }
 
