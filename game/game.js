@@ -98,7 +98,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         if (id in player) {
             if (obj.dir in CONTROL_DIR) {
                 if (player[id].d===CONTROL_DIR[CONTRADICT_DIR[obj.dir]]) return;
-                player[id].d=CONTROL_DIR[obj.dir];
+                player[id].nextd=CONTROL_DIR[obj.dir];
             }
         }
     }
@@ -111,6 +111,11 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         var die={};
         for (i in player) {
             var prof=player[i];
+            if ("nextd" in prof) {
+                prof.d=prof.nextd;
+                delete prof.nextd;
+            }
+
             if (prof.d===STAND_STILL && prof.standFrame<=0) {
                 prof.d=CONTROL_DIR.r;
             } else if (prof.standFrame>0) {
