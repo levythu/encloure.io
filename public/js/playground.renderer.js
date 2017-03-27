@@ -107,7 +107,7 @@ $(function(){
                 if (victim!=player.idnum) {
                     map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
                 }
-            } else if (v<map.DIM_GAP) {
+            } else if (v<map.DIM_GAP && v!=player.idnum) {
                 persistCanvas.clearRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification-6, renderAmplification, renderAmplification);
                 persistCanvasShadow.fillStyle=player.color[1];
                 persistCanvasShadow.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
@@ -146,8 +146,11 @@ $(function(){
             }
         }
         if (("_enclose" in mv) && JSON.stringify(mv._enclose)!==JSON.stringify({})) {
-            for (var i in mv._enclose) map.FloodFill(i);
-            if (persistWholeRenderRequired) wantRender=true;
+            for (var i in mv._enclose) {
+                if (map.FloodFill(i))
+                    if (persistWholeRenderRequired) wantRender=true;
+            }
+
         }
         if (idie) {
             N.close();
@@ -252,7 +255,7 @@ $(function(){
 
                 if (obj._init!==true) {
                     map.SpawnNew(players[i].ox, players[i].oy, players[i].idnum);
-                    renderPersistMapWhole(players[i].ox-1, players[i].ox+1, players[i].oy-1, players[i].oy+1);
+                    renderPersistMapWhole(false, players[i].ox-1, players[i].ox+1, players[i].oy-1, players[i].oy+1);
                 }
 
             }
