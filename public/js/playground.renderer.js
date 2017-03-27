@@ -45,7 +45,7 @@ $(function(){
         $("#scoreboard").css("visibility", "visible")
                         .html("");
         for (var i=0; i<sort.length; i++) {
-            var ratio=sort[i][1]/(globalConf.MapSize[0]*globalConf.MapSize[1]);
+            var ratio=sort[i][1]/(globalConf.MapSize[0]*globalConf.MapSize[1]-map.obstacleCount);
             var relativeRatio=Math.floor(100*(sort[0][1]==0?1/sort.length:sort[i][1]/sort[0][1]));
             var theplayer=players[sort[i][0]];
             var newNode=$('<div class="scoreboardEntry"><span class="txt"></span></div>');
@@ -84,9 +84,9 @@ $(function(){
                     persistCanvas.clearRect(i*renderAmplification, j*renderAmplification-6, renderAmplification, renderAmplification);
                     persistCanvasShadow.clearRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
                 } else if (map.c[i][j]<=map.HARD_OBSTACLE && renderObstacle) {
-                    persistCanvas.fillStyle="#424242";
+                    persistCanvas.fillStyle="#607D8B";
                     persistCanvas.fillRect(i*renderAmplification, j*renderAmplification-6, renderAmplification, renderAmplification);
-                    persistCanvasShadow.fillStyle="#212121";
+                    persistCanvasShadow.fillStyle=(j==globalConf.MapSize[1]-1?"#607D8B":"#263238");
                     persistCanvasShadow.fillRect(i*renderAmplification, j*renderAmplification, renderAmplification, renderAmplification);
                 }
             }

@@ -31,6 +31,7 @@
         // initiate map
         map.c=[];
         map._r=colorRever;  //  {somecolornumber: {xmin: xx, xmax: xx, ymin: xx, ymax: xx, train: {absPosition: true, ...}, elems: {absPosition: recoverColor, ...}  }}, recoverColor will have extra 0.1 if covered color is traling
+        map.obstacleCount=0;
 
         for (var i=0; i<width; i++) {
             var t=[];
@@ -42,12 +43,20 @@
         // membership functions
 
         map.DigestObstacleMap=function(obmap) {
+            var count=0;
             for (var i=0; i<width; i++) {
                 for (var j=0; j<height; j++) {
-                    if (obmap[i][j]==="1") map.Set(i, j, map.HARD_OBSTACLE);
-                    else if (obmap[i][j]==="2") map.Set(i, j, map.SOFT_OBSTACLE);
+                    if (obmap[i][j]==="1") {
+                        map.Set(i, j, map.HARD_OBSTACLE);
+                        count++;
+                    } else if (obmap[i][j]==="2") {
+                        map.Set(i, j, map.SOFT_OBSTACLE);
+                        count++;
+                    }
                 }
             }
+            map.obstacleCount=count;
+            return count;
         };
         map.CollectEnclosure=function() {
             var result={};
