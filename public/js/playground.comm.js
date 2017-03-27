@@ -59,6 +59,11 @@ $(function(){
         };
 
         connection.onerror = function(error) {
+            if (!hasInitiated) {
+                console.log("Encounter with fail: connection failure");
+                setTimeout(findOneRoom, 500);
+                return;
+            }
             console.log('WebSocket Error ' + error);
             onError();
         };
@@ -76,7 +81,7 @@ $(function(){
                 if (typeof(globalConf.profile._fail)=="string") {
                     // TODO in speficy-room mode it may be a prompt, instead of searching another room
                     connection.close();
-                    console("Encounter with fail: "+globalConf.profile._fail);
+                    console.log("Encounter with fail: "+globalConf.profile._fail);
                     setTimeout(findOneRoom, 500);
                     return;
                 }
