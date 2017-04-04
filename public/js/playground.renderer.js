@@ -100,6 +100,7 @@ $(function(){
         for (var i in mv) {
             var player=players[i];
             if (player==null) continue;
+            if ("_die" in mv && i in mv._die) continue;
 
             function draw(xx, yy) {
                 var v=map.c[xx][yy];

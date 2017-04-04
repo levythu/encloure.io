@@ -181,9 +181,9 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
                 var intermediatePos=[];
                 for (var step=0; step<prof.sprintDistance; step++) {
                     _mv();
-                    intermediatePos.push([prof.x, prof.y]);
+                    if (die[i]===true) break;
+                    else intermediatePos.push([prof.x, prof.y]);
                 }
-                intermediatePos.pop();
                 prof.sprinting=false;
                 newMove[i]={
                     x: prof.x,
