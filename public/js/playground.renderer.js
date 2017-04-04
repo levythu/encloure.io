@@ -206,6 +206,14 @@ $(function(){
             player.x+=player.dx;
             player.y+=player.dy;
             if (player.rushingPoint && player.rushingPoint.length>0) {
+                for (var i=0; i<10; i++) {
+                    Effect.Add(new Effect.SparkFlake((ox+Math.random())*renderAmplification+marginForCanvas, (oy+Math.random())*renderAmplification+marginForCanvas,
+                            player.dx==0?Math.random()*50-25:-1*player.dx*(Math.random()*32+10),
+                            player.dy==0?Math.random()*50-25:-1*player.dy*(Math.random()*32+10),
+                            player.color[0])
+                    );
+                }
+
                 while (player.rushingPoint.length>0 &&
                        (player.rushingPoint[0][0]-ox)*(player.rushingPoint[0][0]-player.x)<=0 &&
                        (player.rushingPoint[0][1]-oy)*(player.rushingPoint[0][1]-player.y)<=0
@@ -256,6 +264,7 @@ $(function(){
             var basex=player.x*renderAmplification+renderAmplification/2;
             mainCanvas.fillText(player.nick, basex+marginForCanvas, (player.y*renderAmplification-14)+marginForCanvas);
         }
+        Effect.Render(mainCanvas);
         mainCanvas.restore();
 
         if (globalConf.profile.id in players) {
