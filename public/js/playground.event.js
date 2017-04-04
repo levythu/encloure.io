@@ -21,7 +21,7 @@ $(function(){
             N.send({dir: "d"});
             break;
         case KEY_SPACE:
-            N.send({sprint: 1});
+            // N.send({sprint: 1});
             break;
         default:
             return;
