@@ -139,9 +139,15 @@ $(function(){
                 var nOfFPS=(tm._epic-startServerEpic+startLocalEpic-now)/1000*globalConf.FPS+globalConf.RPSLag*globalConf.FPS/globalConf.RPS;
                 player.dx=(tm.x-player.x)/nOfFPS;
                 player.dy=(tm.y-player.y)/nOfFPS;
+                if (tm.i) {
+                    player.rushingPoint=JSON.parse(JSON.stringify(tm.i));
+                } else {
+                    player.rushingPoint=[];
+                }
             } else {
                 player.dx=0;
                 player.dy=0;
+                player.rushingPoint=[];
             }
 
         }
@@ -195,8 +201,35 @@ $(function(){
 
         for (var i in players) {
             var player=players[i];
+            var ox=player.x, oy=player.y;
             player.x+=player.dx;
             player.y+=player.dy;
+            if (player.rushingPoint && player.rushingPoint.length>0) {
+                while (player.rushingPoint.length>0 &&
+                       (player.rushingPoint[0][0]-ox)*(player.rushingPoint[0][0]-player.x)<=0 &&
+                       (player.rushingPoint[0][1]-oy)*(player.rushingPoint[0][1]-player.y)<=0
+                   ) {
+                       var renderPoint=player.rushingPoint.shift();
+                       var tx=renderPoint[0];
+                       var ty=renderPoint[1];
+                       (function(xx, yy) {
+                           var v=map.c[xx][yy];
+                           if (v==map.NO_OCCUPATION) {
+                               persistCanvas.clearRect(xx*renderAmplification, yy*renderAmplification-6, renderAmplification, renderAmplification);
+                               persistCanvasShadow.fillStyle=player.color[1];
+                               persistCanvasShadow.fillRect(xx*renderAmplification, yy*renderAmplification, renderAmplification, renderAmplification);
+                           } else if (v>=map.DIM_GAP && v<map.DIM_GAP*2) {
+                               persistCanvas.clearRect(xx*renderAmplification, yy*renderAmplification-6, renderAmplification, renderAmplification);
+                               persistCanvasShadow.fillStyle=player.color[1];
+                               persistCanvasShadow.fillRect(xx*renderAmplification, yy*renderAmplification, renderAmplification, renderAmplification);
+                           } else if (v>=0 && v<map.DIM_GAP && v!=player.idnum) {
+                               persistCanvas.clearRect(xx*renderAmplification, yy*renderAmplification-6, renderAmplification, renderAmplification);
+                               persistCanvasShadow.fillStyle=player.color[1];
+                               persistCanvasShadow.fillRect(xx*renderAmplification, yy*renderAmplification, renderAmplification, renderAmplification);
+                           }
+                       })(tx, ty);
+                   }
+            }
         }
 
         mainCanvas.save();
@@ -305,6 +338,11 @@ $(function(){
                         var nOfFPS=(tm._epic-startServerEpic+startLocalEpic-now)/1000*globalConf.FPS+globalConf.RPSLag*globalConf.FPS/globalConf.RPS;
                         players[i].dx=(tm.x-players[i].x)/nOfFPS;
                         players[i].dy=(tm.y-players[i].y)/nOfFPS;
+                        if (tm.i) {
+                            players[i].rushingPoint=JSON.parse(JSON.stringify(tm.i));
+                        } else {
+                            players[i].rushingPoint=[];
+                        }
                     }
                 }
             }
