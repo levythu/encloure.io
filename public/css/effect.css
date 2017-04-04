@@ -1,0 +1,15 @@
+.gameButton {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    padding-left: 1em;
+    padding-right: 1em;
+    background-color: #009688;
+    border-bottom: solid 7px #00796B;
+    display: inline-block;
+    color: white;
+    cursor: default;
+}
+.gameButton:hover {
+    background-color: #4DB6AC;
+    border-bottom: solid 7px #009688;
+}

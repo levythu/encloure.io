@@ -4,6 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link href="/css/playground.layout.css" rel='stylesheet' type='text/css'>
+    <link href="/css/effect.css" rel='stylesheet' type='text/css'>
 
     <title>Enclosure.io</title>
 
@@ -13,14 +14,13 @@
     <script type="text/javascript" src="/js/utils/queue.js"></script>
 
     <script type="text/javascript" src="/js/playground.comm.js"></script>
+    <script type="text/javascript" src="/js/playground.js"></script>
     <script type="text/javascript" src="/js/playground.event.js"></script>
     <script type="text/javascript" src="/js/playground.effect.js"></script>
     <script type="text/javascript" src="/js/playground.renderer.js"></script>
 </head>
 <body>
-    <!-- <div id="welcomeScreen">
 
-    </div> -->
     <div id="container">
         <canvas id="persistCanvasShadow" class="maxSize kernelCanvas movingCanvas"></canvas>
         <canvas id="persistCanvas" class="maxSize kernelCanvas movingCanvas"></canvas>
@@ -41,6 +41,14 @@
         <div class="scoreboardEntry"><div class="beforeEntry"></div>Levy - 100%</div>
         <div class="scoreboardEntry"><div class="beforeEntry"></div>Levy - 100%</div>
         <div class="scoreboardEntry"><div class="beforeEntry"></div>Levy - 100%</div>
+    </div>
+    <div id="welcomeScreen">
+        <div class="center">
+            <div class="Headline">Connecting...</div>
+            <a class="gameButton">
+                Back to Lobby
+            </a>
+        </div>
     </div>
 </body>
 

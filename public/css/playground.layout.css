@@ -122,7 +122,7 @@
     text-align: left;
 }
 
-#welconme {
+#welcomeScreen {
     position: absolute;
     left: 0;
     top: 0;
@@ -130,4 +130,20 @@
     height: 100%;
     overflow: hidden;
     background-color: #333333;
+    top: -110%;
+}
+
+#welcomeScreen .center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.Headline {
+    font-size: 3em;
+    color: #fefefe;
+    margin-bottom: 1em;
 }
