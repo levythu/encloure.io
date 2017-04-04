@@ -159,6 +159,19 @@ $(function(){
         var idie=false;
         if ("_die" in mv) {
             for (var i in mv._die) {
+                if (i in map._r) {
+                    for (var e in map._r[i].elems) {
+                        var p=-(-e);
+                        var oldv=map._r[i].elems[e];
+                        Effect.Add(new Effect.Debris(
+                            Math.floor(p/globalConf.MapSize[1])*renderAmplification+marginForCanvas,
+                            p%globalConf.MapSize[1]*renderAmplification+marginForCanvas,
+                            renderAmplification, renderAmplification,
+                            oldv%1===0?players[i].color[2]:players[i].color[1]
+                        ));
+                    }
+                }
+
                 map.DeleteColor(-(-i));
                 delete players[i];
                 if (i===globalConf.profile.id) idie=true;
