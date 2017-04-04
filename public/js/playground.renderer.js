@@ -160,15 +160,19 @@ $(function(){
         if ("_die" in mv) {
             for (var i in mv._die) {
                 if (i in map._r) {
+                    var MAX_DEBRIS=100;
+                    var totalc=Object.keys(map._r[i].elems).length;
+                    var possibility=totalc<=MAX_DEBRIS?1:MAX_DEBRIS/totalc;
                     for (var e in map._r[i].elems) {
                         var p=-(-e);
                         var oldv=map._r[i].elems[e];
-                        Effect.Add(new Effect.Debris(
-                            Math.floor(p/globalConf.MapSize[1])*renderAmplification+marginForCanvas,
-                            p%globalConf.MapSize[1]*renderAmplification+marginForCanvas,
-                            renderAmplification, renderAmplification,
-                            oldv%1===0?players[i].color[2]:players[i].color[1]
-                        ));
+                        if (Math.random()<possibility)
+                            Effect.Add(new Effect.Debris(
+                                Math.floor(p/globalConf.MapSize[1])*renderAmplification+marginForCanvas,
+                                p%globalConf.MapSize[1]*renderAmplification+marginForCanvas,
+                                renderAmplification, renderAmplification,
+                                oldv%1===0?players[i].color[2]:players[i].color[1]
+                            ));
                     }
                 }
 
@@ -188,7 +192,9 @@ $(function(){
         }
         if (idie) {
             N.close();
-            alert("Hey dude, you DIED!");
+            setTimeout(function(){
+                alert("Hey dude, you DIED!");
+            }, 3000);
         }
         if (wantRender) renderPersistMapWhole(hasDelete);
     }
