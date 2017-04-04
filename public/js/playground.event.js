@@ -3,6 +3,7 @@ $(function(){
     var KEY_DOWN=40;
     var KEY_LEFT=37;
     var KEY_RIGHT=39;
+    var KEY_SPACE=32;
 
     function keyboardHook(e) {
         var keyPressed=e.keyCode;
@@ -18,6 +19,9 @@ $(function(){
             break;
         case KEY_DOWN:
             N.send({dir: "d"});
+            break;
+        case KEY_SPACE:
+            N.send({sprint: 1});
             break;
         default:
             return;

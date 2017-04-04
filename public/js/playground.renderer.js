@@ -101,24 +101,33 @@ $(function(){
             var player=players[i];
             if (player==null) continue;
 
-            var v=map.c[mv[i].x][mv[i].y];
-            if (v==map.NO_OCCUPATION) {
-                persistCanvas.clearRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification-6, renderAmplification, renderAmplification);
-                persistCanvasShadow.fillStyle=player.color[1];
-                persistCanvasShadow.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
-                map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
-            } else if (v>=map.DIM_GAP && v<map.DIM_GAP*2) {
-                var victim=v-map.DIM_GAP;
-                if (victim!=player.idnum) {
-                    map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
-                }
-            } else if (v>=0 && v<map.DIM_GAP && v!=player.idnum) {
-                persistCanvas.clearRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification-6, renderAmplification, renderAmplification);
-                persistCanvasShadow.fillStyle=player.color[1];
-                persistCanvasShadow.fillRect(mv[i].x*renderAmplification, mv[i].y*renderAmplification, renderAmplification, renderAmplification);
+            function draw(xx, yy) {
+                var v=map.c[xx][yy];
+                if (v==map.NO_OCCUPATION) {
+                    persistCanvas.clearRect(xx*renderAmplification, yy*renderAmplification-6, renderAmplification, renderAmplification);
+                    persistCanvasShadow.fillStyle=player.color[1];
+                    persistCanvasShadow.fillRect(xx*renderAmplification, yy*renderAmplification, renderAmplification, renderAmplification);
+                    map.Set(xx, yy, player.idnum+map.DIM_GAP);
+                } else if (v>=map.DIM_GAP && v<map.DIM_GAP*2) {
+                    var victim=v-map.DIM_GAP;
+                    if (victim!=player.idnum) {
+                        map.Set(xx, yy, player.idnum+map.DIM_GAP);
+                    }
+                } else if (v>=0 && v<map.DIM_GAP && v!=player.idnum) {
+                    persistCanvas.clearRect(xx*renderAmplification, yy*renderAmplification-6, renderAmplification, renderAmplification);
+                    persistCanvasShadow.fillStyle=player.color[1];
+                    persistCanvasShadow.fillRect(xx*renderAmplification, yy*renderAmplification, renderAmplification, renderAmplification);
 
-                map.Set(mv[i].x, mv[i].y, player.idnum+map.DIM_GAP);
+                    map.Set(xx, yy, player.idnum+map.DIM_GAP);
+                }
             }
+            if (mv[i].i) {
+                for (var p=0; p<mv[i].i.length; p++) {
+                    draw(mv[i].i[p][0], mv[i].i[p][1]);
+                }
+            }
+            draw(mv[i].x, mv[i].y);
+
             player.x=mv[i].x;
             player.y=mv[i].y;
             player.ox=mv[i].x;

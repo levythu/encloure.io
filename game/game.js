@@ -75,6 +75,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         playerProfile.standFrame=conf.game.player.standingFrame;
         playerProfile.color=PALLET[colorChoosen];
         playerProfile.speed=conf.game.player.speed;
+        playerProfile.sprintDistance=conf.game.player.sprintDistance;
         playerProfile.shouldMove=playerProfile.speed;
         if (playerProfile.nick==null) playerProfile.nick=getname();
         colorChoosen=(colorChoosen+1)%PALLET.length;
@@ -104,6 +105,10 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
                 if (player[id].d===CONTROL_DIR[CONTRADICT_DIR[obj.dir]]) return;
                 player[id].nextd=CONTROL_DIR[obj.dir];
             }
+            if (obj.sprint) {
+                // TODO cd!
+                player[id].sprinting=true;
+            }
         }
     }
 
@@ -131,47 +136,66 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
             prof.shouldMove=prof.speed;
             shouldBC=true;
 
-            prof.x=prof.x+prof.d[0];
-            if (prof.x<0) {
-                die[i]=true;
-                continue;
-            } else if (prof.x>=gameConf.MapSize[0]) {
-                die[i]=true;
-                continue;
-            }
-            prof.y=prof.y+prof.d[1];
-            if (prof.y<0) {
-                die[i]=true;
-                continue;
-            } else if (prof.y>=gameConf.MapSize[1]) {
-                die[i]=true;
-                continue;
+            function _mv() {
+                prof.x=prof.x+prof.d[0];
+                if (prof.x<0) {
+                    die[i]=true;
+                    return;
+                } else if (prof.x>=gameConf.MapSize[0]) {
+                    die[i]=true;
+                    return;
+                }
+                prof.y=prof.y+prof.d[1];
+                if (prof.y<0) {
+                    die[i]=true;
+                    return;
+                } else if (prof.y>=gameConf.MapSize[1]) {
+                    die[i]=true;
+                    return;
+                }
+
+                var idnum=-(-i);
+                var v=game.map.c[prof.x][prof.y];
+                if (v==idnum) {
+                    floodList[v]=true;
+                } else if (v==game.map.NO_OCCUPATION) {
+                    game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+                } else if (v>=game.map.DIM_GAP && v<game.map.DIM_GAP*2) {
+                    // walk in someone.
+                    var victim=v-game.map.DIM_GAP;
+                    die[victim]=true;
+                    if (player[victim].x===prof.x && player[victim].y===prof.y) {
+                        // a head-to-head collosion! both die
+                        die[i]=true;
+                    } else if (victim!=idnum) {
+                        game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+                    }
+                } else if (v>=0 && v<game.map.DIM_GAP) {
+                    game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+                } else if (v==game.map.SOFT_OBSTACLE || v==game.map.HARD_OBSTACLE) {
+                    die[i]=true;
+                }
             }
 
-            newMove[i]={
-                x: prof.x,
-                y: prof.y,
-            };
-            var idnum=-(-i);
-            var v=game.map.c[prof.x][prof.y];
-            if (v==idnum) {
-                floodList[v]=true;
-            } else if (v==game.map.NO_OCCUPATION) {
-                game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
-            } else if (v>=game.map.DIM_GAP && v<game.map.DIM_GAP*2) {
-                // walk in someone.
-                var victim=v-game.map.DIM_GAP;
-                die[victim]=true;
-                if (player[victim].x===prof.x && player[victim].y===prof.y) {
-                    // a head-to-head collosion! both die
-                    die[i]=true;
-                } else if (victim!=idnum) {
-                    game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+            if (prof.sprinting===true) {
+                var intermediatePos=[];
+                for (var step=0; step<prof.sprintDistance; step++) {
+                    _mv();
+                    intermediatePos.push([prof.x, prof.y]);
                 }
-            } else if (v>=0 && v<game.map.DIM_GAP) {
-                game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
-            } else if (v==game.map.SOFT_OBSTACLE || v==game.map.HARD_OBSTACLE) {
-                die[i]=true;
+                intermediatePos.pop();
+                prof.sprinting=false;
+                newMove[i]={
+                    x: prof.x,
+                    y: prof.y,
+                    i: intermediatePos,
+                };
+            } else {
+                _mv();
+                newMove[i]={
+                    x: prof.x,
+                    y: prof.y,
+                };
             }
 
             prof.lastMoveTime=now;

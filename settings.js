@@ -15,6 +15,7 @@ module.exports={
         player:     {
             speed:          1,        // how many RPS does one move
             standingFrame:  6,        // how many RPSs one new spawned player can stand still
+            sprintDistance: 7,
         },
     },
 
