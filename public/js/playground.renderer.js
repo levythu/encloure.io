@@ -200,8 +200,8 @@ $(function(){
         if (idie) {
             N.close();
             setTimeout(function(){
-                alert("Hey dude, you DIED!");
-            }, 3000);
+                OutSider.ShowDeath();
+            }, 1500);
         }
         if (wantRender) renderPersistMapWhole(hasDelete);
     }

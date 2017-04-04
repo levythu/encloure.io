@@ -142,6 +142,9 @@
     text-align: center;
 }
 
+#ScoreScreen {
+    color: #fefefe;
+}
 .Headline {
     font-size: 3em;
     color: #fefefe;

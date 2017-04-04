@@ -8,6 +8,8 @@
     display: inline-block;
     color: white;
     cursor: default;
+    margin: 1em;
+    text-decoration: none;
 }
 .gameButton:hover {
     background-color: #4DB6AC;
