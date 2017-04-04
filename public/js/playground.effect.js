@@ -46,7 +46,7 @@ $(function() {
         this.color.a=1;
         this.sx=Math.random()*16-8;
         this.sy=Math.random()*16-8;
-        this.sa=Math.random()*6-3;
+        this.sa=(Math.random()*6-3)*Math.PI/180;
         this.frameToLive=Math.random()*30+10;
         this.salpha=1/this.frameToLive;
     }

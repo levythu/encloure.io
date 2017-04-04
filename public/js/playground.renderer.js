@@ -126,6 +126,10 @@ $(function(){
                 for (var p=0; p<mv[i].i.length; p++) {
                     draw(mv[i].i[p][0], mv[i].i[p][1]);
                 }
+                if (i==globalConf.profile.id) {
+                    $("#sprintButton").removeClass("actionButtonActivated");
+                    $("#sprintButton .indicator").css("height", "100%");
+                }
             }
             draw(mv[i].x, mv[i].y);
 
@@ -157,6 +161,9 @@ $(function(){
         var wantRender=false;
         var hasDelete=false;
         var idie=false;
+        if ("_sprint" in mv) {
+            $("#sprintButton .indicator").css("height", "0%");
+        }
         if ("_die" in mv) {
             for (var i in mv._die) {
                 if (i in map._r) {
@@ -356,12 +363,19 @@ $(function(){
         if ("enclose" in obj) {
             obj.move._enclose=obj.enclose;
         }
+        if ("sprint" in obj) {
+            if (globalConf.profile.id in obj.sprint)
+                obj.move._sprint=true;
+        }
         if ("move" in obj) {
             moves.EnQueue(obj.move);
             for (var i in obj.move) {
                 if (i in players) {
                     obj.move[i]._epic=obj._epic;
                     players[i].moves.EnQueue(obj.move[i]);
+                    if (i==globalConf.profile.id && obj.move[i].i) {
+                        $("#sprintButton").addClass("actionButtonActivated");
+                    }
                     if (players[i].moves.GetLen()==1) {
                         var tm=players[i].moves.Peak();
                         var nOfFPS=(tm._epic-startServerEpic+startLocalEpic-now)/1000*globalConf.FPS+globalConf.RPSLag*globalConf.FPS/globalConf.RPS;

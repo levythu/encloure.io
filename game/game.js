@@ -76,6 +76,8 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         playerProfile.color=PALLET[colorChoosen];
         playerProfile.speed=conf.game.player.speed;
         playerProfile.sprintDistance=conf.game.player.sprintDistance;
+        playerProfile.sprintCD=conf.game.player.sprintCD;
+        playerProfile.remainingsprintCD=0;
         playerProfile.shouldMove=playerProfile.speed;
         if (playerProfile.nick==null) playerProfile.nick=getname();
         colorChoosen=(colorChoosen+1)%PALLET.length;
@@ -106,8 +108,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
                 player[id].nextd=CONTROL_DIR[obj.dir];
             }
             if (obj.sprint) {
-                // TODO cd!
-                player[id].sprinting=true;
+                if (player[id].remainingsprintCD===0) player[id].sprinting=true;
             }
         }
     }
@@ -118,6 +119,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         var shouldBC=false;
         var floodList={};
         var die={};
+        var enableSprint={};
         for (i in player) {
             var prof=player[i];
             if ("nextd" in prof) {
@@ -129,6 +131,14 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
                 prof.d=CONTROL_DIR.r;
             } else if (prof.standFrame>0) {
                 prof.standFrame--;
+            }
+
+            if (prof.remainingsprintCD>0) {
+                prof.remainingsprintCD--;
+                if (prof.remainingsprintCD==0) {
+                    enableSprint[prof.id]=true;
+                    shouldBC=true;
+                }
             }
 
             prof.shouldMove--;
@@ -185,6 +195,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
                     else intermediatePos.push([prof.x, prof.y]);
                 }
                 prof.sprinting=false;
+                prof.remainingsprintCD=prof.sprintCD;
                 newMove[i]={
                     x: prof.x,
                     y: prof.y,
@@ -215,6 +226,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
                 move: newMove,
                 enclose: floodList,
                 die: die,
+                sprint: enableSprint,
                 _epic: now,
             });
         }
