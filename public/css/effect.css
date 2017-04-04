@@ -13,3 +13,10 @@
     background-color: #4DB6AC;
     border-bottom: solid 7px #009688;
 }
+
+.transit_in_position {
+    transition: left 0.5s cubic-bezier(0, 0.91, 0.58, 1),right 0.5s cubic-bezier(0, 0.91, 0.58, 1),top 0.5s cubic-bezier(0, 0.91, 0.58, 1),bottom 0.5s cubic-bezier(0, 0.91, 0.58, 1);
+    -webkit-transition: left 0.5s cubic-bezier(0, 0.91, 0.58, 1),right 0.5s cubic-bezier(0, 0.91, 0.58, 1),top 0.5s cubic-bezier(0, 0.91, 0.58, 1),bottom 0.5s cubic-bezier(0, 0.91, 0.58, 1);
+    -ms-transition: left 0.5s cubic-bezier(0, 0.91, 0.58, 1),right 0.5s cubic-bezier(0, 0.91, 0.58, 1),top 0.5s cubic-bezier(0, 0.91, 0.58, 1),bottom 0.5s cubic-bezier(0, 0.91, 0.58, 1);
+    -moz-transition: left 0.5s cubic-bezier(0, 0.91, 0.58, 1),right 0.5s cubic-bezier(0, 0.91, 0.58, 1),top 0.5s cubic-bezier(0, 0.91, 0.58, 1),bottom 0.5s cubic-bezier(0, 0.91, 0.58, 1);
+}

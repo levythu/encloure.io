@@ -33,17 +33,18 @@ $(function(){
         return result;
     }
     function findOneRoom() {
+        $("#loadingCaption").text("Finding one available room...");
         console.log("Finding rooms...")
         $.get("/gm/getserver", function(data) {
             params.endpoint=data;
             window.location.hash=generateHash();
             connectTo(data);
         }).fail(function() {
-            alert("Fail to get a game.");
+            $("#loadingCaption").text("☹ Sorry, we cannot pinpoint a available room. Please try later.");
         });
     }
     function connectTo(data) {
-        console.log("Connecting:" + data);
+        $("#loadingCaption").text("Connecting to the gameserver...");
         var connection = new WebSocket(data);
         var hasInitiated=false;
 
@@ -60,7 +61,7 @@ $(function(){
 
         connection.onerror = function(error) {
             if (!hasInitiated) {
-                console.log("Encounter with fail: connection failure");
+                $("#loadingCaption").text("☹ Fail to join the room, we are trying to get another one...");
                 setTimeout(findOneRoom, 500);
                 return;
             }
@@ -81,12 +82,17 @@ $(function(){
                 if (typeof(globalConf.profile._fail)=="string") {
                     // TODO in speficy-room mode it may be a prompt, instead of searching another room
                     connection.close();
+                    $("#loadingCaption").text("☹"+globalConf.profile._fail+". We are trying to get another one...");
                     console.log("Encounter with fail: "+globalConf.profile._fail);
                     setTimeout(findOneRoom, 500);
                     return;
                 }
 
                 hasInitiated=true;
+                $("#loadingCaption").text("Here we go!");
+                setTimeout(function() {
+                    OutSider.HideWelcome();
+                }, 500);
                 $("body").trigger("gm-init");
             } else {
                 $("body").trigger("gm-msg", [res]);

@@ -130,7 +130,7 @@
     height: 100%;
     overflow: hidden;
     background-color: #333333;
-    top: -110%;
+    top: 0%;
 }
 
 #welcomeScreen .center {
