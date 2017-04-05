@@ -178,6 +178,10 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
                         // a head-to-head collosion! both die
                         die[i]=true;
                     } else if (victim!=idnum) {
+                        if (prof.remainingsprintCD>0) {
+                            prof.remainingsprintCD=0;
+                            enableSprint[prof.id]=true;
+                        }
                         game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
                     }
                 } else if (v>=0 && v<game.map.DIM_GAP) {
@@ -188,14 +192,14 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
             }
 
             if (prof.sprinting===true) {
+                prof.sprinting=false;
+                prof.remainingsprintCD=prof.sprintCD;
                 var intermediatePos=[];
                 for (var step=0; step<prof.sprintDistance; step++) {
                     _mv();
                     if (die[i]===true) break;
                     else intermediatePos.push([prof.x, prof.y]);
                 }
-                prof.sprinting=false;
-                prof.remainingsprintCD=prof.sprintCD;
                 newMove[i]={
                     x: prof.x,
                     y: prof.y,
