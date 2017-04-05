@@ -251,8 +251,9 @@
                         for (var i=0; i<cros.length; i++) {
                             var tx=src[0]+cros[i][0];
                             var ty=src[1]+cros[i][1];
+                            var p=tx*height+ty;
                             if (tx<singleRever.xmin || ty<singleRever.ymin || tx>singleRever.xmax || ty>singleRever.ymax ||
-                                (map.c[tx][ty] in record) || map.c[tx][ty]===map.HARD_OBSTACLE) {
+                                (record[visitMap[p]]===false) || map.c[tx][ty]===map.HARD_OBSTACLE) {
                                 record[round]=false;
                                 stack.length=0;
                                 break;
