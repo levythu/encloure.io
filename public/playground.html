@@ -4,6 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link href="/css/playground.layout.css" rel='stylesheet' type='text/css'>
+    <link href="/css/effect.css" rel='stylesheet' type='text/css'>
 
     <title>Enclosure.io</title>
 
@@ -13,14 +14,26 @@
     <script type="text/javascript" src="/js/utils/queue.js"></script>
 
     <script type="text/javascript" src="/js/playground.comm.js"></script>
+    <script type="text/javascript" src="/js/playground.js"></script>
     <script type="text/javascript" src="/js/playground.event.js"></script>
+    <script type="text/javascript" src="/js/playground.effect.js"></script>
     <script type="text/javascript" src="/js/playground.renderer.js"></script>
 </head>
 <body>
+
     <div id="container">
         <canvas id="persistCanvasShadow" class="maxSize kernelCanvas movingCanvas"></canvas>
         <canvas id="persistCanvas" class="maxSize kernelCanvas movingCanvas"></canvas>
         <canvas id="mainCanvas" class="maxSize kernelCanvas movingCanvas"></canvas>
+        <canvas id="effectCanvas" class="maxSize kernelCanvas movingCanvas"></canvas>
+    </div>
+    <div id="controller">
+        <div id="actions">
+            <div id="sprintButton" class="actionButton" title="Sprint several blocks, press [SPACE] to use.">
+                <img class="actionIcon" src="/img/directions_run.svg"/>
+                <div class="indicator"></div>
+            </div>
+        </div>
     </div>
     <div id="scoreboard">
         <div class="scoreboardEntry"><div class="beforeEntry"></div>Levy - 100%</div>
@@ -28,6 +41,29 @@
         <div class="scoreboardEntry"><div class="beforeEntry"></div>Levy - 100%</div>
         <div class="scoreboardEntry"><div class="beforeEntry"></div>Levy - 100%</div>
         <div class="scoreboardEntry"><div class="beforeEntry"></div>Levy - 100%</div>
+    </div>
+    <div id="welcomeScreen" class="transit_in_position">
+        <div class="center" id="LoadingScreen">
+            <div class="Headline" id="loadingCaption">Connecting to game server...</div>
+            <a class="gameButton">
+                Back to Lobby
+            </a>
+        </div>
+        <div class="center" id="ScoreScreen">
+            <div class="Headline" id="loadingCaption">Oops, you die... 😂</div>
+            <div style="display: inline-block; text-align: left;">
+                Best Percentage: 50.0%,<br/>
+                Players Killed: 5,<br/>
+                Times Alive: 5:30,<br/>
+            </div>
+            <div style="height: 2em;"></div>
+            <a class="gameButton">
+                Back to Lobby
+            </a>
+            <a class="gameButton" href="javascript:window.location.reload();">
+                Try Again!
+            </a>
+        </div>
     </div>
 </body>
 
