@@ -12,6 +12,7 @@ $(function(){
     var CANVAS_WIDTH, CANVAS_HEIGHT;      // in pixel!
     var players={};
     var map;
+    var finalStatistics;
 
     var startServerEpic=0;
     var startLocalEpic=0;
@@ -22,6 +23,21 @@ $(function(){
     }
     function fromNumIDtoID(numid) {
         return ""+numid;
+    }
+
+    // from milisseconds to time format, credit to http://stackoverflow.com/questions/9763441/milliseconds-to-time-in-javascript
+    function msToTime(s) {
+        var ms = s % 1000;
+        s = (s - ms) / 1000;
+        var secs = s % 60;
+        s = (s - secs) / 60;
+        var mins = s % 60;
+        var hrs = (s - mins) / 60;
+
+        var ret=(mins<10?"0"+mins:mins) + ':' + (secs<10?"0"+secs:secs);
+        if (hrs>0) ret=hrs + ':' +ret;
+
+        return ret
     }
 
     function renderScoreboard() {
@@ -199,6 +215,18 @@ $(function(){
         }
         if (idie) {
             N.close();
+            if (finalStatistics) {
+                $("#statisticsBoard").text(
+                    "Best Percentage: "+Math.floor(finalStatistics.bestPercentage*1000)/10+"%, \n"+
+                    "Players Killed: "+finalStatistics.numbersKill+", \n"+
+                    "Time Alive: "+msToTime(finalStatistics.timeLives)+", \n"
+                )
+            } else {
+                $("#statisticsBoard").text(
+                    "\n"
+                )
+            }
+
             setTimeout(function(){
                 OutSider.ShowDeath();
             }, 1500);
@@ -389,6 +417,10 @@ $(function(){
                     }
                 }
             }
+        }
+        if ("statistics" in obj) {
+            finalStatistics=obj.statistics;
+            console.log(finalStatistics);
         }
     });
 });

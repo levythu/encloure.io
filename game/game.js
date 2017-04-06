@@ -53,6 +53,17 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         game.map.DigestObstacleMap(gameConf.map);
     }
     game.userOnline=0;
+
+    game.refreshStatistics=function() {
+        var result=game.map.CollectEnclosure();
+        for (var i in result) {
+            if (!(i in player)) continue;
+            var ratio=result[i]/(gameConf.MapSize[0]*gameConf.MapSize[1]-game.map.obstacleCount);
+            if (player[i].statistics.bestPercentage<ratio) player[i].statistics.bestPercentage=ratio;
+        }
+        setTimeout(game.refreshStatistics, 1000);
+    }
+
     // id is a string and playerProfile is its profile to be initialized
     game.JoinNewPlayer=function(id, playerProfile) {
         if (game.userOnline>=gameConf.MaxPlayer) {
@@ -99,6 +110,11 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
             _epic: now,
         });
         playerProfile.lastMoveTime=now;
+        playerProfile.statistics={
+            bestPercentage: 0,
+            numbersKill: 0,
+            timeSpawned: now,
+        };
     };
     // id is a string and obj is a js-object
     game.onControl=function(id, obj) {
@@ -182,6 +198,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
                             prof.remainingsprintCD=0;
                             enableSprint[prof.id]=true;
                         }
+                        prof.statistics.numbersKill++;
                         game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
                     }
                 } else if (v>=0 && v<game.map.DIM_GAP) {
@@ -216,6 +233,13 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
             prof.lastMoveTime=now;
         }
         for (var i in die) {
+            server.Send(player[i].id, {
+                statistics: {
+                    bestPercentage: player[i].statistics.bestPercentage,
+                    numbersKill: player[i].statistics.numbersKill,
+                    timeLives: now-player[i].statistics.timeSpawned,
+                }
+            });
             game.map.DeleteColor(-(-i));
             delete player[i];
             game.userOnline--;
@@ -247,6 +271,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         startPoint=(new Date()).getTime();
         nextPoint=startPoint+interval;
         setTimeout(game.onTick, nextPoint-startPoint);
+        setTimeout(game.refreshStatistics, 1000);
     };
 
     return game;
