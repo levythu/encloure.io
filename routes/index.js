@@ -3,13 +3,19 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res) {
-    res.sendFile('home.html', {
-        root: './public/'
-    }, function(err) {
-        if (err) {
-            console.log(err);
-        }
-    });
+    if (req.session.author != undefined){
+        res.redirect('user/play');
+    }
+    else{
+        res.redirect('user/login');
+    }
+    // res.sendFile('home.html', {
+    //     root: './public/'
+    // }, function(err) {
+    //     if (err) {
+    //         console.log(err);
+    //     }
+    // });
 });
 
 router.get('/playground', function(req, res){
@@ -20,6 +26,16 @@ router.get('/playground', function(req, res){
             console.log(err);
         }
     });
+});
+
+router.get('/quickgame', function(req, res) {
+    res.render('quickgame', {});
+});
+
+router.post('/quickgame', function(req, res){
+    var token = encodeURIComponent(req.body.name);
+    var type = "quickgame";
+    res.redirect('/playground#token='+token+'&type='+type);
 });
 
 module.exports = router;

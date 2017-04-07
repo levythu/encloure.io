@@ -1,0 +1,34 @@
+<% include ./partials/head %>
+
+<body>
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="navbar-left"><a href="/quickgame" class="navbutton">Quick Game</a></li>
+        <li role="presentation" class="navbar-right"><a href="/user/login" class="navbutton">Log In</a></li>
+
+        <li role="presentation" class="navbar-right"><a href="/user/register" class="navbutton" >Register</a></li>
+
+
+    </ul>
+    <div class="page-header">
+        <h1 class="text-center">
+        Enclosure.io
+        </h1>
+    </div>
+
+    <div style="margin-top: 60px;">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="panel-body">
+                <form method="post" action="/quickgame">
+                    <label>Your name: </label>
+                    <input type="text" class="form-control noborder" maxlength="20" name="name" required/>
+                    <input type="submit" class="btn btn-block mybutton" value="Quick Game">
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="/js/jquery/jquery-1.11.1.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+</body>
+
+</html>

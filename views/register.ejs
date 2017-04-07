@@ -1,0 +1,48 @@
+<% include ./partials/head %>
+
+<body>
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="navbar-left"><a href="/quickgame" class="navbutton">Quick Game</a></li>
+        <li role="presentation" class="navbar-right"><a href="/user/login" class="navbutton">Log In</a></li>
+    </ul>
+    <div class="page-header">
+        <h1 class="text-center">
+        Enclosure.io
+        </h1>
+    </div>
+
+    <div style="margin-top: 60px;">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="panel-heading">
+                <h1 class="panel-title" style="font-size:20px;">Register</h1>
+                <%if (typeof error != 'undefined'){ %>
+                    <%= error %>
+                <% } else { %>
+                    <br/>
+                <% } %>
+            </div>
+            <div class="panel-body">
+                <form class="form-signin" method="post" action="/user/register">
+                    <label>Email</label>
+                    <input class="form-control noborder" maxlength="50" name="email" type="text" required />
+
+
+                    <label style="margin-top: 15px;">User Name</label>
+                    <input class="form-control noborder" maxlength="20" name="username" type="text" required />
+
+                    <label style="margin-top: 15px;">Password</label>
+                    <input class="form-control noborder" maxlength="200" name="password1" type="password" required />
+                    <label style="margin-top: 15px;">Confirm Password</label>
+                    <input class="form-control noborder" maxlength="200" name="password2" type="password" required />
+
+                    <input type="submit" class="btn btn-block mybutton" value="Register" />
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="/js/jquery/jquery-1.11.1.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+</body>
+
+</html>
