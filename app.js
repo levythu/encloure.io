@@ -4,6 +4,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+
+var conf=require("./settings");
 
 var index = require('./routes/index');
 var master=require("./routes/master");
@@ -15,17 +18,6 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// authentication functions. Not sure what these mean.
-app.use(function(req, res, next) {
-  if (req.url === '/secure' && (!req.session || !req.session.authenticated)) {
-    // res.render('unauthorised', { status: 403 });
-    res.render('home', { status: 403 });
-    return;
-  }
-
-  next();
-});
-app.use(express.session({ secret: conf.server.masterSecret }));
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -33,11 +25,18 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(session({secret: conf.server.masterSecret, saveUninitialized: false, resave: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/gm', master.r);
 app.use('/user', user.r);
+
+
+// app.use(function(req, res) {
+//     res.redirect("https://s.levy.at"+req.originalUrl);
+// });
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

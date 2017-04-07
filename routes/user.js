@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var request=require("request");
-// var passport = require('passport');
-// var User = require('../models/user')
 
 var randomGen = require("../utils/randomGen");
 var userdb = require("../models/userdb");
@@ -29,7 +27,8 @@ router.post('/quickgame', function(req, res){
     // console.log(req.body.name);
     // var token = encodeURIComponent(randomGen.GenerateUUID(16));
     var token = encodeURIComponent(req.body.name);
-    res.redirect('../playground#token='+token);
+    var type = "quickgame";
+    res.redirect('../playground#token='+token+'&type='+type);
 });
 
 router.get('/register', function(req, res) {
@@ -50,7 +49,7 @@ router.post('/register', function(req, res) {
         if (doc == null){
             userdb.storeAccount(req.body.email, 
                 req.body.username, req.body.password, function(){});
-            req.session.authenticated = true;
+            req.session.author = req.body.user;
             res.redirect('/play?email='+encodeURIComponent(req.body.email));
         } else{
             res.render('register', {error: 'The email is already taken.'});
@@ -75,7 +74,7 @@ router.post('/login', function(req, res) {
             }
             else{
                 // authentication
-                req.session.authenticated = true;
+                req.session.author = req.body.user;
                 res.redirect('/play?email='+encodeURIComponent(req.body.email));
             }
         } else{
@@ -98,7 +97,7 @@ router.get('/friends', function(req, res) {
 });
 
 router.get('/logout', function(req, res) {
-    delete req.session.authenticated;
+    req.session.author = undefined;
     res.redirect('../');
 });
 
