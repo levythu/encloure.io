@@ -12,16 +12,14 @@
         <h1 class="text-center">
         Enclosure.io
         </h1>
-    </div>
-    <div>
-        <h2>Hello, <%= username %>!</h2>   
+        <h2 class="text-center">Hello, <%= username %>!</h2>   
     </div>
     <div style="margin-top: 60px;">
         <div class="col-md-4 col-md-offset-4"> 
             <div class="panel-body">
 
                 <form class="form-signin" method="post" action="/user/profile">
-                    <label style="margin-top: 15px;">New username</label>
+                    <label style="margin-top: 15px;">Chage Username:</label>
                     <input class="form-control noborder" maxlength="20" name="username" type="text" value="<%= username %>" required />
 
                     <input type="submit" class="btn btn-block mybutton" value="Update" />
