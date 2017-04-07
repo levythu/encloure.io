@@ -9,13 +9,6 @@ router.get('/', function(req, res) {
     else{
         res.redirect('user/login');
     }
-    // res.sendFile('home.html', {
-    //     root: './public/'
-    // }, function(err) {
-    //     if (err) {
-    //         console.log(err);
-    //     }
-    // });
 });
 
 router.get('/playground', function(req, res){

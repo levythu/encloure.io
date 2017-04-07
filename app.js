@@ -10,7 +10,8 @@ var conf=require("./settings");
 
 var index = require('./routes/index');
 var master=require("./routes/master");
-var user=require("./routes/user");
+var user  =require("./routes/user");
+var auth  =require("./routes/auth");
 
 var app = express();
 
@@ -31,6 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/gm', master.r);
 app.use('/user', user.r);
+app.use('/auth', auth);
 
 
 // app.use(function(req, res) {

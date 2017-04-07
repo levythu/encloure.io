@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var request=require("request");
-var url = require('url');
 
 var randomGen = require("../utils/randomGen");
 var userdb = require("../models/userdb");
@@ -10,20 +9,18 @@ var conf=require("../settings");
 
 var crypto = require('crypto');
 
+var tokens = {}
+
 router.get('/', function(req, res, next) {
     res.render('index', { title: 'Enclosure.io' });
 });
 
 router.get('/play', function(req, res){
-    var urlParts = url.parse(req.url, true);
-    console.log(urlParts);
-    if (urlParts.query.email != undefined){
-        var email = urlParts.query.email;
+    if (req.session.author == undefined){
+        res.redirect('./login');
+        return;
     }
-    else{
-        var email = req.session.author;
-    }
-    userdb.findAccount(email, function(err, doc) {
+    userdb.findAccount(req.session.author, function(err, doc) {
         if (doc == null){
             req.session.author = undefined;
             res.redirect('/error');
@@ -36,9 +33,24 @@ router.get('/play', function(req, res){
 });
 
 router.post('/quickgame', function(req, res){
-    var token = encodeURIComponent(req.session.author);
-    var type = "quickgame";
-    res.redirect('/playground#token='+token+'&type='+type);
+    if (req.session.author == undefined){
+        res.redirect('./login');
+        return;
+    }
+    userdb.findAccount(req.session.author, function(err, doc) {
+        if (doc == null){
+            req.session.author = undefined;
+            res.redirect('/error');
+            return;
+        } else{
+            var token = randomGen.GenerateUUID(16);
+            var type = "user";
+            tokens[token] = {'email': req.body.email,
+                            'username': req.body.username};
+            res.redirect('/playground#token='+token+'&type='+type);
+            return;
+        }
+    });
 });
 
 router.get('/register', function(req, res) {
@@ -63,7 +75,7 @@ router.post('/register', function(req, res) {
             userdb.storeAccount(req.body.email, 
                 req.body.username, pwd, function(){});
             req.session.author = req.body.email;
-            res.redirect('./play?email='+encodeURIComponent(req.body.email));
+            res.redirect('./play');
             return;
         } else{
             res.render('register', {error: 'The email is already taken.'});
@@ -103,16 +115,43 @@ router.post('/login', function(req, res) {
     });
 });
 
-// TODO
 router.get('/profile', function(req, res) {
+    if (req.session.author == undefined){
+        res.redirect('./login');
+        return;
+    }
     userdb.findAccount(req.session.author, function(err, doc) {
         if (doc == null){
             req.session.author = undefined;
             res.redirect('/error');
             return;
         } else{
-            res.render('profile', {username: doc.username});
+            res.render('profile', {username: doc.username, email: doc.email});
             return;
+        }
+    });
+    return;
+});
+
+router.post('/profile', function(req, res) {
+    if (req.session.author == undefined){
+        res.redirect('./login');
+        return;
+    }
+    userdb.findAccount(req.session.author, function(err, doc) {
+        if (doc == null){
+            req.session.author = undefined;
+            res.redirect('/error');
+            return;
+        } else{
+            userdb.updateAccount(doc.email, 
+                req.body.username, function(err, newDoc, lastErrorObject){
+                res.render('profile', {
+                    username: newDoc.username, 
+                    email: newDoc.email
+                });
+                return;
+            });
         }
     });
     return;
@@ -120,6 +159,10 @@ router.get('/profile', function(req, res) {
 
 // TODO
 router.get('/friends', function(req, res) {
+    if (req.session.author == undefined){
+        res.redirect('./login');
+        return;
+    }
     res.render('index', { title: 'Enclosure.io' });
     return;
 });
@@ -135,3 +178,5 @@ function encrypt(password){
 }
 
 exports.r = router;
+
+exports.tokens = tokens;
