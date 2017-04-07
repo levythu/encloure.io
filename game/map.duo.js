@@ -13,6 +13,9 @@
         NO_OCCUPATION: -1,  // used to set a cell for empty
         NOT_DECIDED: -100,  // not used outside
 
+        HARD_OBSTACLE: -100000, // hard obstacle cannot be used as an edge of enclosure
+        SOFT_OBSTACLE: -100001, // while soft can
+
          // i+DIM_GAP*k is treated all as player i. To be precise, i is the enclosed
          // district, i+DIM_GAP is the un enclosed trailing, the further numbers
          // are reserved.
@@ -27,7 +30,8 @@
 
         // initiate map
         map.c=[];
-        map._r=colorRever;  //  {somecolornumber: {xmin: xx, xmax: xx, ymin: xx, ymax: xx, elems: {absPosition: recoverColor, ...}  }}, recoverColor will have extra 0.1 if covered color is traling
+        map._r=colorRever;  //  {somecolornumber: {xmin: xx, xmax: xx, ymin: xx, ymax: xx, train: {absPosition: true, ...}, elems: {absPosition: recoverColor, ...}  }}, recoverColor will have extra 0.1 if covered color is traling
+        map.obstacleCount=0;
 
         for (var i=0; i<width; i++) {
             var t=[];
@@ -38,6 +42,22 @@
         }
         // membership functions
 
+        map.DigestObstacleMap=function(obmap) {
+            var count=0;
+            for (var i=0; i<width; i++) {
+                for (var j=0; j<height; j++) {
+                    if (obmap[i][j]==="1") {
+                        map.Set(i, j, map.HARD_OBSTACLE);
+                        count++;
+                    } else if (obmap[i][j]==="2") {
+                        map.Set(i, j, map.SOFT_OBSTACLE);
+                        count++;
+                    }
+                }
+            }
+            map.obstacleCount=count;
+            return count;
+        };
         map.CollectEnclosure=function() {
             var result={};
             for (var i in colorRever) {
@@ -118,7 +138,10 @@
             var oldv=map.c[x][y];
             if (oldv>=0) {
                 var c=oldv%map.DIM_GAP;
-                if (c in colorRever) delete colorRever[c].elems[p];
+                if (c in colorRever) {
+                    delete colorRever[c].elems[p];
+                    delete colorRever[c].trail[p];
+                }
             }
             if (v>=0) {
                 var c=v%map.DIM_GAP;
@@ -134,6 +157,7 @@
                         ymin: y,
                         ymax: y,
                         elems: {},
+                        trail: {},
                     };
                 } else {
                     if (x<colorRever[c].xmin) colorRever[c].xmin=x;
@@ -141,10 +165,13 @@
                     if (y<colorRever[c].ymin) colorRever[c].ymin=y;
                     if (y>colorRever[c].ymax) colorRever[c].ymax=y;
                 }
-                if (c===v)  // is base color
+                if (c===v) {  // is base color
+                    delete colorRever[c].trail[p];
                     colorRever[c].elems[p]=map.NO_OCCUPATION;
-                else
+                } else {
+                    colorRever[c].trail[p]=true;
                     colorRever[c].elems[p]=map.c[x][y]+0.1;
+                }
             }
 
             map.c[x][y]=v;
@@ -184,18 +211,32 @@
         map.FloodFill=function(colorId) {
             var colorId=-(-colorId);
             var singleRever=colorRever[colorId];
-            if (singleRever==null) return;
+            if (singleRever==null) return false;
             var round=map.NOT_DECIDED;
             var record={};
             var blanks=[];
             var blanksHead=0;
             var visitMap={};
-            for (var i=singleRever.xmin; i<=singleRever.xmax; i++) {
-                var p=i*height;
-                for (var j=singleRever.ymin; j<=singleRever.ymax; j++) {
-                    if (map.c[i][j]==map.NO_OCCUPATION || (map.c[i][j]>=0 && map.c[i][j] % map.DIM_GAP!=colorId)) blanks.push(p+j);
+
+            var tfilter={};
+            var hasSomeTrail=false;
+            for (var i in singleRever.trail) {
+                hasSomeTrail=true;
+                var p=-(-i);
+                var tx=Math.floor(p/height);
+                var ty=p%height;
+                for (var j=0; j<cros.length; j++) {
+                    if (tx+cros[j][0]<singleRever.xmin || ty+cros[j][1]<singleRever.ymin || tx+cros[j][0]>singleRever.xmax || ty+cros[j][1]>singleRever.ymax) continue;
+                    var np=p+cros[j][0]*height+cros[j][1];
+                    if (np in tfilter) continue;
+                    var theone=map.c[tx+cros[j][0]][ty+cros[j][1]];
+                    if (theone==map.NO_OCCUPATION || (theone>=0 && theone % map.DIM_GAP!=colorId)) {
+                        blanks.push(np);
+                        tfilter[np]=true;
+                    }
                 }
             }
+            if (blanks.length==0 && !hasSomeTrail) return false;
             while (true) {
                 while (blanksHead<blanks.length && (blanks[blanksHead] in visitMap)) blanksHead++;
                 if (blanksHead==blanks.length) break;
@@ -210,8 +251,11 @@
                         for (var i=0; i<cros.length; i++) {
                             var tx=src[0]+cros[i][0];
                             var ty=src[1]+cros[i][1];
-                            if (tx<singleRever.xmin || ty<singleRever.ymin || tx>singleRever.xmax || ty>singleRever.ymax) {
+                            var p=tx*height+ty;
+                            if (tx<singleRever.xmin || ty<singleRever.ymin || tx>singleRever.xmax || ty>singleRever.ymax ||
+                                (record[visitMap[p]]===false) || map.c[tx][ty]===map.HARD_OBSTACLE) {
                                 record[round]=false;
+                                stack.length=0;
                                 break;
                             }
                         }
@@ -230,19 +274,24 @@
                     }
                 }
             }
-            for (var i=singleRever.xmin; i<=singleRever.xmax; i++) {
-                var p=i*height;
-                for (var j=singleRever.ymin; j<=singleRever.ymax; j++) {
-                    if (record[visitMap[p+j]]===true) {
-                        map.Set(i, j, colorId);
-                    } else {
-                        if (map.c[i][j]>=0) {
-                            var numid=map.c[i][j]%map.DIM_GAP;
-                            if (numid==colorId) map.Set(i, j, colorId);
-                        }
-                    }
+
+            var ttrail=singleRever.trail;
+            singleRever.trail={};
+            for (var i in ttrail) {
+                p=-(-i);
+                var tx=Math.floor(p/height);
+                var ty=p%height;
+                map.Set(tx, ty, colorId);
+            }
+            for (var i in visitMap) {
+                if (record[visitMap[i]]) {
+                    p=-(-i);
+                    var tx=Math.floor(p/height);
+                    var ty=p%height;
+                    map.Set(tx, ty, colorId);
                 }
             }
+            return true;
         }
 
         return map;

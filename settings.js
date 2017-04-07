@@ -7,12 +7,16 @@ module.exports={
         RPSLag:     1,      // the lag between client and server, typically the slowest speed
 
         defaultMap: {
-            MapSize:    [80, 80], // default map size
-            MaxPlayer:  20,
+            MapSize:        [80, 80], // default map size
+            MaxPlayer:      20,
+            map: require("./game/exampleMap.circle"),
         },
 
         player:     {
-            speed:      1,  // how many RPS does one move
+            speed:          1,        // how many RPS does one move
+            standingFrame:  6,        // how many RPSs one new spawned player can stand still
+            sprintDistance: 7,
+            sprintCD:       30,
         },
     },
 

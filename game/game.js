@@ -8,6 +8,7 @@ var CONTROL_DIR={
     "l":    [-1, 0],
     "r":    [1 , 0],
 }
+var STAND_STILL=[0, 0];
 var CONTRADICT_DIR={
     "u":    "d",
     "d":    "u",
@@ -48,7 +49,21 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
 
     game.position={};
     game.map=Map(gameConf.MapSize[0], gameConf.MapSize[1]);
+    if ("map" in gameConf) {
+        game.map.DigestObstacleMap(gameConf.map);
+    }
     game.userOnline=0;
+
+    game.refreshStatistics=function() {
+        var result=game.map.CollectEnclosure();
+        for (var i in result) {
+            if (!(i in player)) continue;
+            var ratio=result[i]/(gameConf.MapSize[0]*gameConf.MapSize[1]-game.map.obstacleCount);
+            if (player[i].statistics.bestPercentage<ratio) player[i].statistics.bestPercentage=ratio;
+        }
+        setTimeout(game.refreshStatistics, 1000);
+    }
+
     // id is a string and playerProfile is its profile to be initialized
     game.JoinNewPlayer=function(id, playerProfile) {
         if (game.userOnline>=gameConf.MaxPlayer) {
@@ -67,9 +82,13 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         player[id]=playerProfile;
         playerProfile.x=resTuple[0];
         playerProfile.y=resTuple[1];
-        playerProfile.d=CONTROL_DIR.r;
+        playerProfile.d=STAND_STILL;
+        playerProfile.standFrame=conf.game.player.standingFrame;
         playerProfile.color=PALLET[colorChoosen];
         playerProfile.speed=conf.game.player.speed;
+        playerProfile.sprintDistance=conf.game.player.sprintDistance;
+        playerProfile.sprintCD=conf.game.player.sprintCD;
+        playerProfile.remainingsprintCD=0;
         playerProfile.shouldMove=playerProfile.speed;
         if (playerProfile.nick==null) playerProfile.nick=getname();
         colorChoosen=(colorChoosen+1)%PALLET.length;
@@ -86,17 +105,26 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         server.Send(id, {
             join: player,
             maprever: game.map._r,
+            map: ("map" in gameConf?gameConf.map:null),
             _init: true,
             _epic: now,
         });
         playerProfile.lastMoveTime=now;
+        playerProfile.statistics={
+            bestPercentage: 0,
+            numbersKill: 0,
+            timeSpawned: now,
+        };
     };
     // id is a string and obj is a js-object
     game.onControl=function(id, obj) {
         if (id in player) {
             if (obj.dir in CONTROL_DIR) {
                 if (player[id].d===CONTROL_DIR[CONTRADICT_DIR[obj.dir]]) return;
-                player[id].d=CONTROL_DIR[obj.dir];
+                player[id].nextd=CONTROL_DIR[obj.dir];
+            }
+            if (obj.sprint) {
+                if (player[id].remainingsprintCD===0) player[id].sprinting=true;
             }
         }
     }
@@ -107,58 +135,111 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         var shouldBC=false;
         var floodList={};
         var die={};
+        var enableSprint={};
         for (i in player) {
             var prof=player[i];
+            if ("nextd" in prof) {
+                prof.d=prof.nextd;
+                delete prof.nextd;
+            }
+
+            if (prof.d===STAND_STILL && prof.standFrame<=0) {
+                prof.d=CONTROL_DIR.r;
+            } else if (prof.standFrame>0) {
+                prof.standFrame--;
+            }
+
+            if (prof.remainingsprintCD>0) {
+                prof.remainingsprintCD--;
+                if (prof.remainingsprintCD==0) {
+                    enableSprint[prof.id]=true;
+                    shouldBC=true;
+                }
+            }
 
             prof.shouldMove--;
             if (prof.shouldMove>0) continue;
             prof.shouldMove=prof.speed;
             shouldBC=true;
 
-            prof.x=prof.x+prof.d[0];
-            if (prof.x<0) {
-                die[i]=true;
-                continue;
-            } else if (prof.x>=gameConf.MapSize[0]) {
-                die[i]=true;
-                continue;
-            }
-            prof.y=prof.y+prof.d[1];
-            if (prof.y<0) {
-                die[i]=true;
-                continue;
-            } else if (prof.y>=gameConf.MapSize[1]) {
-                die[i]=true;
-                continue;
+            function _mv() {
+                prof.x=prof.x+prof.d[0];
+                if (prof.x<0) {
+                    die[i]=true;
+                    return;
+                } else if (prof.x>=gameConf.MapSize[0]) {
+                    die[i]=true;
+                    return;
+                }
+                prof.y=prof.y+prof.d[1];
+                if (prof.y<0) {
+                    die[i]=true;
+                    return;
+                } else if (prof.y>=gameConf.MapSize[1]) {
+                    die[i]=true;
+                    return;
+                }
+
+                var idnum=-(-i);
+                var v=game.map.c[prof.x][prof.y];
+                if (v==idnum) {
+                    floodList[v]=true;
+                } else if (v==game.map.NO_OCCUPATION) {
+                    game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+                } else if (v>=game.map.DIM_GAP && v<game.map.DIM_GAP*2) {
+                    // walk in someone.
+                    var victim=v-game.map.DIM_GAP;
+                    die[victim]=true;
+                    if (player[victim].x===prof.x && player[victim].y===prof.y) {
+                        // a head-to-head collosion! both die
+                        die[i]=true;
+                    } else if (victim!=idnum) {
+                        if (prof.remainingsprintCD>0) {
+                            prof.remainingsprintCD=0;
+                            enableSprint[prof.id]=true;
+                        }
+                        prof.statistics.numbersKill++;
+                        game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+                    }
+                } else if (v>=0 && v<game.map.DIM_GAP) {
+                    game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+                } else if (v==game.map.SOFT_OBSTACLE || v==game.map.HARD_OBSTACLE) {
+                    die[i]=true;
+                }
             }
 
-            newMove[i]={
-                x: prof.x,
-                y: prof.y,
-            };
-            var idnum=-(-i);
-            var v=game.map.c[prof.x][prof.y];
-            if (v==idnum) {
-                floodList[v]=true;
-            } else if (v==game.map.NO_OCCUPATION) {
-                game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
-            } else if (v>=game.map.DIM_GAP && v<game.map.DIM_GAP*2) {
-                // walk in someone.
-                var victim=v-game.map.DIM_GAP;
-                die[victim]=true;
-                if (player[victim].x===prof.x && player[victim].y===prof.y) {
-                    // a head-to-head collosion! both die
-                    die[i]=true;
-                } else if (victim!=idnum) {
-                    game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+            if (prof.sprinting===true) {
+                prof.sprinting=false;
+                prof.remainingsprintCD=prof.sprintCD;
+                var intermediatePos=[];
+                for (var step=0; step<prof.sprintDistance; step++) {
+                    _mv();
+                    if (die[i]===true) break;
+                    else intermediatePos.push([prof.x, prof.y]);
                 }
-            } else if (v<game.map.DIM_GAP) {
-                game.map.Set(prof.x, prof.y, idnum+game.map.DIM_GAP);
+                newMove[i]={
+                    x: prof.x,
+                    y: prof.y,
+                    i: intermediatePos,
+                };
+            } else {
+                _mv();
+                newMove[i]={
+                    x: prof.x,
+                    y: prof.y,
+                };
             }
 
             prof.lastMoveTime=now;
         }
         for (var i in die) {
+            server.Send(player[i].id, {
+                statistics: {
+                    bestPercentage: player[i].statistics.bestPercentage,
+                    numbersKill: player[i].statistics.numbersKill,
+                    timeLives: now-player[i].statistics.timeSpawned,
+                }
+            });
             game.map.DeleteColor(-(-i));
             delete player[i];
             game.userOnline--;
@@ -173,6 +254,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
                 move: newMove,
                 enclose: floodList,
                 die: die,
+                sprint: enableSprint,
                 _epic: now,
             });
         }
@@ -189,6 +271,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         startPoint=(new Date()).getTime();
         nextPoint=startPoint+interval;
         setTimeout(game.onTick, nextPoint-startPoint);
+        setTimeout(game.refreshStatistics, 1000);
     };
 
     return game;
