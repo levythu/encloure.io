@@ -2,6 +2,7 @@ body,
 html {
   background: #333333;
   color: white;
+  font-size: 15px;
 }
 .nav-tabs {
   border: none;
@@ -10,5 +11,4 @@ html {
 }
 .page-header {
     border: none;
-    
 }

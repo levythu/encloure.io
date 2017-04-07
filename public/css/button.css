@@ -1,0 +1,78 @@
+.mybutton {
+    margin-top: 40px;
+    background-color: #eaec4b;
+    border-bottom: 6px solid #a1a130;
+    color: #888a34;
+    line-height: 24px;
+    font-size: 24px;
+    border-radius: 0px;
+}
+
+.mybutton:hover {
+    background: #fafc5b;
+    color: #888a34;
+    border-bottom: 6px solid #a1a130;
+}
+
+.noborder {
+    border-radius: 0px;
+}
+
+.navbutton {
+    color: white;
+}
+
+.navbutton:hover {
+    color: black;
+}
+
+.nav-tabs>li>a {
+    line-height: 1.42857143;
+    border: 1px solid transparent;
+    border-radius: 0px 0px 0 0;
+}
+
+.navbar-right {
+    float: right!important;
+    margin-right: 0px;
+}
+
+.col-md-15 {
+    width: 20%;
+    float: left;
+}
+/*
+.col-xs-15,
+.col-sm-15,
+.col-md-15,
+.col-lg-15 {
+    position: relative;
+    min-height: 1px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+.col-xs-15 {
+    width: 20%;
+    float: left;
+}
+
+@media (min-width: 768px) {
+.col-sm-15 {
+        width: 20%;
+        float: left;
+    }
+}
+
+@media (min-width: 992px) {
+    .col-md-15 {
+        width: 20%;
+        float: left;
+    }
+}
+
+@media (min-width: 1200px) {
+    .col-lg-15 {
+        width: 20%;
+        float: left;
+    }
+}*/
