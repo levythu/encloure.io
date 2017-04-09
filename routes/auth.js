@@ -6,8 +6,8 @@ var tokens = require('./user').tokens;
 
 router.get('/', function(req, res) {
     var urlParts = url.parse(req.url, true);
-    if (tokens[urlParts.query.token] != undefined){
-        res.send(JSON.stringfy(tokens[urlParts.query.token]));
+    if (urlParts.query.token in tokens){
+        res.send(JSON.stringify(tokens[urlParts.query.token]));
         return;
     }
     else{

@@ -12,7 +12,13 @@ var crypto = require('crypto');
 var tokens = {}
 
 router.get('/', function(req, res, next) {
-    res.render('index', { title: 'Enclosure.io' });
+    if (req.session.author == undefined){
+        res.redirect('./login');
+        return;
+    } else{
+        res.redirect('./play');
+        return;
+    }
 });
 
 router.get('/play', function(req, res){
@@ -45,8 +51,8 @@ router.post('/quickgame', function(req, res){
         } else{
             var token = randomGen.GenerateUUID(16);
             var type = "user";
-            tokens[token] = {'email': req.body.email,
-                            'username': req.body.username};
+            tokens[token] = {'email': doc.email,
+                            'username': doc.username};
             res.redirect('/playground#token='+token+'&type='+type);
             return;
         }
