@@ -8,12 +8,8 @@
 
     </ul>
 
-    <div class="page-header">
-        <h1 class="text-center">
-        Enclosure.io
-        </h1>
-        <h2 class="text-center">Hello, <%= username %>!</h2>    
-    </div>
+    <% include ./partials/image %>
+    <h2 class="text-center">Hello, <%= username %> !</h2>
 
     <div style="margin-top: 100px;">
       <div class="col-md-15">&nbsp;</div>
@@ -28,7 +24,7 @@
                 <button type="button" class="list-group-item list-group-item-action" style="border-bottom-left-radius:0;border-bottom-right-radius: 0;">4&nbsp;&nbsp;&nbsp;&nbsp;Map: abc&nbsp;&nbsp;&nbsp;&nbsp;Players: 9/10</button>
             </div>
         </div>
-<div class="col-md-15">&nbsp;</div>
+        <div class="col-md-15">&nbsp;</div>
         <div class="col-md-15">
             <label style="font-size:20px;">Feeling not Decisive?</label>
             <form method="post" action="/user/quickgame">
