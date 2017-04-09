@@ -3,7 +3,7 @@ var conf=require("../settings");
 var url = conf.database.url;
 
 var mongojs = require('mongojs');
-var db = mongojs(url, ['gameServers', 'rooms']);
+var db = mongojs(url, ['gameServers', 'rooms', 'users']);
 
 exports.insertDoc = function(collectionName, doc) {
     db.collection(collectionName).insert(doc, function(){});
@@ -62,3 +62,5 @@ exports.getServer = function(callback) {
         callback(docs);
     });
 }
+
+exports.db = db
