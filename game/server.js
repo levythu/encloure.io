@@ -2,6 +2,8 @@ var conf=require("../settings");
 var game=require("./game");
 var WebSocket=require("ws");
 
+var request=require("request");
+
 function NewServer(callback, gameConf=conf.game.defaultMap) {
     var count=0;
     var clients={};
@@ -47,9 +49,26 @@ function NewServer(callback, gameConf=conf.game.defaultMap) {
         var obj;
         try {
             obj=JSON.parse(message);
-            succ({
-                nick: obj.token,
-            });
+            if (obj.type==="user") {
+                request.get(conf.server.masterEndPoint+"/auth?token="+obj.token, {}, function(err, response, body) {
+                    if (err) {
+                        fail();
+                        return;
+                    }
+                    var ret=JSON.parse(body);
+                    if ("username" in ret) {
+                        succ({
+                            nick: ret.username,
+                        });
+                    } else {
+                        fail();
+                    }
+                });
+            } else {
+                succ({
+                    nick: obj.token,
+                });
+            }
         } catch (e) {
             fail();
         }
@@ -85,6 +104,10 @@ function NewServer(callback, gameConf=conf.game.defaultMap) {
                 });
                 server.onConnect(client);
             }, function() {
+                ws.send(JSON.stringify({
+                    _fail: "Fail to validate token... will return lobby soon.",
+                    _fatalFail: true,
+                }));
                 try {
                     ws.close();
                 } catch (e) {
