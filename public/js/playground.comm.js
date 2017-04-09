@@ -52,10 +52,12 @@ $(function(){
             // TODO
         }
 
+        // TODO dont't restart in non-quickgame mode
         connection.onopen = function() {
             hasInitiated=false;
             var toPost={_init: true};
             toPost.token=params.token;
+            toPost.type=params.type;
             connection.send(JSON.stringify(toPost));
         };
 
@@ -82,7 +84,8 @@ $(function(){
                 if (typeof(globalConf.profile._fail)=="string") {
                     // TODO in speficy-room mode it may be a prompt, instead of searching another room
                     connection.close();
-                    $("#loadingCaption").text("☹"+globalConf.profile._fail+". We are trying to get another one...");
+                    // TODO room-full info will be alerted... not correct
+                    $("#loadingCaption").text("☹ "+globalConf.profile._fail+". We are trying to get another one...");
                     console.log("Encounter with fail: "+globalConf.profile._fail);
                     setTimeout(findOneRoom, 500);
                     return;
