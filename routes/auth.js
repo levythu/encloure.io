@@ -12,7 +12,7 @@ router.get('/', function(req, res) {
     }
     else{
         ret = {"error" : "invalid token"};
-        res.send(JSON.stringfy(ret));
+        res.send(JSON.stringify(ret));
         return;
     }
 });
