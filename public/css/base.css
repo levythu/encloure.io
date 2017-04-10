@@ -1,8 +1,21 @@
+@font-face {
+    font-family: "fffforwa";
+    src: url("../FFFFORWA.TTF") format("truetype");
+}
+h1{
+  text-align: center;
+}
 body,
 html {
   background: #333333;
   color: white;
   font-size: 15px;
+  font-family: "fffforwa", Verdana, Tahoma;
+}
+label {
+  margin-top: 30px;
+  font-weight: normal;
+  font-size: 20px;
 }
 .nav-tabs {
   border: none;
@@ -11,4 +24,39 @@ html {
 }
 .page-header {
     border: none;
+    margin-top: 0px;
+}
+.form-control{
+  height: 45px;
+  line-height: 4;
+  font-size: 18px;
+  padding-top: 10px;
+    border:none;
+    border-radius: 0px;
+}
+.row {
+   margin-right: 0px;
+   margin-left: 0px;
+}
+.bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+  width: 100%;
+}
+.btn {
+  border-radius: 0;
+  line-height: 2;
+}
+.dropdown-menu {
+  border-radius: 0px;
+}
+:focus{
+  outline:none !important;
+}
+.bootstrap-select .dropdown-toggle:focus {
+  outline: none !important;
+}
+.nav-tabs>li {
+  margin-bottom: 0; 
+}
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover{
+  border: 1px solid #fff;
 }
