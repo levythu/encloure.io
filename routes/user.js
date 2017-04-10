@@ -8,6 +8,7 @@ var userdb = require("../models/userdb");
 var conf=require("../settings");
 
 var crypto = require('crypto');
+var validator = require('validator');
 
 var tokens = {}
 
@@ -65,26 +66,36 @@ router.get('/register', function(req, res) {
 });
 
 router.post('/register', function(req, res) {
-    if (!req.body.password1 || !req.body.password2 || !req.body.email || !req.body.username){
-        res.render('register', {error: 'Email, username and password are required.'});
-        return;
-    }
-    if (req.body.password1 !== req.body.password2){
-        res.render('register', {error: 'The passwords do not match.'});
-        return;
-    }
-
+    errors = []
     var pwd = encrypt(req.body.password1);
 
     userdb.findAccount(req.body.email, function(err, doc) {
         if (doc == null){
+            if (!req.body.password1 || !req.body.password2 || !req.body.email || !req.body.username){
+                errors.push('Email, username and password are required.');
+            }
+
+            if (!validator.isEmail(req.body.email)){
+                errors.push('The email is not valid.');
+            }
+
+            if (req.body.password1 !== req.body.password2){
+                errors.push('The passwords do not match.');
+            }
+
+            if (errors.length != 0){
+                res.render('register', {errors: errors});
+                return
+            }
+
             userdb.storeAccount(req.body.email, 
                 req.body.username, pwd, function(){});
             req.session.author = req.body.email;
             res.redirect('./play');
             return;
         } else{
-            res.render('register', {error: 'The email is already taken.'});
+            errors.push('The email is already taken.');
+            res.render('register', {errors: errors});
             return;
         }
     });
@@ -96,16 +107,19 @@ router.get('/login', function(req, res) {
 });
 
 router.post('/login', function(req, res) {
+    errors = []
     if (!req.body.password || !req.body.email){
-        res.render('home', {error: 'Email and password are required.'});
-                return;
+        errors.push('Email and password are required.');
+        res.render('home', {errors: errors});
+        return;
     }
 
     var pwd = encrypt(req.body.password);
     userdb.findAccount(req.body.email, function(err, doc) {
         if (doc != null){
             if (doc.password !== pwd){
-                res.render('home', {error: 'Invalid password'});
+                errors.push('Invalid password');
+                res.render('home', {errors: errors});
                 return;
             }
             else{
@@ -115,7 +129,8 @@ router.post('/login', function(req, res) {
                 return;
             }
         } else{
-            res.render('home', {error: 'Email account not exists.'});
+            errors.push('Email account does not exist.');
+            res.render('home', {errors: errors});
             return;
         }
     });
