@@ -1,10 +1,10 @@
 .mybutton {
     margin-top: 40px;
+    padding-top: 10px;
     background-color: #eaec4b;
     border-bottom: 6px solid #a1a130;
     color: #888a34;
-    line-height: 24px;
-    font-size: 24px;
+    font-size: 25px;
     border-radius: 0px;
 }
 

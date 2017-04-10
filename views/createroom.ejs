@@ -1,0 +1,65 @@
+<% include ./partials/head %>
+
+    <body>
+        <ul class="nav nav-tabs">
+            <li role="presentation" class="navbar-right"><a href="/user/logout" class="navbutton">LOGOUT</a></li>
+            <li role="presentation" class="navbar-right"><a href="/user/profile" class="navbutton">PROFILE</a></li>
+            <li role="presentation" class="navbar-right"><a href="/user/play" class="navbutton">PLAY</a></li>
+        </ul>
+    <% include ./partials/image %>
+
+        <div style="margin-top: 20px;">
+            <div class="col-md-4 col-md-offset-4">
+                <div class="panel-heading">
+                    <h1 class="panel-title" style="font-size:40px;">Create Room</h1>
+                </div>
+                <div class="panel-body">
+
+                    <form class="form-signin" method="post" action="/TODO">
+                        <label>Map</label>
+                        <br/>
+                        <select class="selectpicker">
+                          <option>Dead Cross</option>
+                          <option>Fuck CSS</option>
+                          <option>The Room</option>
+                          <option>Valor Wins</option>
+                        </select>
+                        <br/>
+                        <br/>
+                        <label style="margin-top: 15px;">Map Preview:</label><br>
+                        <div class="row">
+                            <img style="margin-top: 15px;" width="75%" height="75%" src="../blank.png">
+                        </div>
+                        <br/>
+
+                        <label style="margin-top: 15px;">Sprint Distance</label>
+                        <br/>
+                        <select class="selectpicker">
+                          <option>3</option>
+                          <option>5</option>
+                          <option>7</option>
+                          <option>9</option>
+                        </select>
+                        <br/>
+                        <br/>
+                        <label style="margin-top: 15px;">Sprint CD</label>
+                        <br/>
+                        <select class="selectpicker">
+                          <option>1s</option>
+                          <option>3s</option>
+                          <option>5s</option>
+                          <option>10s</option>
+                        </select>
+
+                        <input type="submit" class="btn btn-block mybutton" value="Create" />
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="/js/jquery/jquery-1.11.1.min.js"></script>
+        <script src="/js/bootstrap/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+    </body>
+
+</html>
