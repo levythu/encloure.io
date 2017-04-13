@@ -144,7 +144,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
             }
 
             if (prof.d===STAND_STILL && prof.standFrame<=0) {
-                prof.d=CONTROL_DIR.r;
+                prof.d=CONTROL_DIR["udlr"[Math.floor(Math.random()*4)]];
             } else if (prof.standFrame>0) {
                 prof.standFrame--;
             }
