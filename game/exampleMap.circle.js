@@ -1,4 +1,4 @@
-module.exports=[    // should be exactly the same size of MapSize, 0 is empty, 1 is hardobstacle, 2 is softob, [3 is spawnpoint]
+module.exports=[    // should be exactly the same size of MapSize, 0 is empty, 1 is hardobstacle, 2 is softob, [S is spawnpoint, default is everywhere]
     "11111111111111111111111111111111110000000000001111111111111111111111111111111111",
     "11111111111111111111111111111000000000000000000000011111111111111111111111111111",
     "11111111111111111111111111000000000000000000000000000011111111111111111111111111",

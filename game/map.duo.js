@@ -32,6 +32,7 @@
         map.c=[];
         map._r=colorRever;  //  {somecolornumber: {xmin: xx, xmax: xx, ymin: xx, ymax: xx, train: {absPosition: true, ...}, elems: {absPosition: recoverColor, ...}  }}, recoverColor will have extra 0.1 if covered color is traling
         map.obstacleCount=0;
+        map.SpawnPlace=null;
 
         for (var i=0; i<width; i++) {
             var t=[];
@@ -52,6 +53,9 @@
                     } else if (obmap[i][j]==="2") {
                         map.Set(i, j, map.SOFT_OBSTACLE);
                         count++;
+                    } else if (obmap[i][j]==="S") {
+                        if (map.SpawnPlace==null) map.SpawnPlace=[];
+                        map.SpawnPlace.push([i, j]);
                     }
                 }
             }

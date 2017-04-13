@@ -71,7 +71,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
             return;
         }
 
-        var resTuple=game.map.FindSpawnPlace();
+        var resTuple=game.map.FindSpawnPlace(game.map.SpawnPlace);
         if (resTuple==null) {
             // no place to spawn
             playerProfile._fail="The room is dominated and there's no place to spawn!";
