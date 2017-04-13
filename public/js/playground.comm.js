@@ -1,6 +1,7 @@
 var globalConf;
 
 var N={};
+var _URL={};
 
 // Events triggered:
 //      - gm-init: The game is inited and all the parameters are stored in globalConf;
@@ -9,6 +10,7 @@ $(function(){
     var params={};
     function parseHash() {
         params={};
+        _URL.params=params;
         var hash=window.location.hash.substring(1);
         var tp=hash.split('&');
         for (var i=0; i<tp.length; i++) {
