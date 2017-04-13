@@ -25,7 +25,7 @@ module.exports={
         hostname: "aws.levy.at",
 
         // will be used only for gameserver, indicating where's the master
-        masterEndPoint: "http://aws.levy.at:3000",
+        masterEndPoint: "http://aws.levy.at:4000",
         // useful for both server, gameserver use this to register on master
         masterSecret: "BingoLingo!",
     },
