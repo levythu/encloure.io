@@ -71,7 +71,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
             return;
         }
 
-        var resTuple=game.map.FindSpawnPlace();
+        var resTuple=game.map.FindSpawnPlace(game.map.SpawnPlace);
         if (resTuple==null) {
             // no place to spawn
             playerProfile._fail="The room is dominated and there's no place to spawn!";
@@ -144,7 +144,7 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
             }
 
             if (prof.d===STAND_STILL && prof.standFrame<=0) {
-                prof.d=CONTROL_DIR.r;
+                prof.d=CONTROL_DIR["udlr"[Math.floor(Math.random()*4)]];
             } else if (prof.standFrame>0) {
                 prof.standFrame--;
             }
