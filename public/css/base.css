@@ -10,7 +10,7 @@ html {
   background: #333333;
   color: white;
   font-size: 15px;
-  font-family: "fffforwa", Verdana, Tahoma;
+  
 }
 label {
   margin-top: 30px;
@@ -55,7 +55,7 @@ label {
   outline: none !important;
 }
 .nav-tabs>li {
-  margin-bottom: 0; 
+  margin-bottom: 0;
 }
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover{
   border: 1px solid #fff;
