@@ -48,6 +48,7 @@ function NewGame(server, gameConf, playerConf) {
     // other per class states
     var colorChoosen=0;
 
+    game.isRunning=false;
     game.position={};
     game.map=Map(gameConf.MapSize[0], gameConf.MapSize[1]);
     if ("map" in gameConf) {
@@ -62,7 +63,7 @@ function NewGame(server, gameConf, playerConf) {
             var ratio=result[i]/(gameConf.MapSize[0]*gameConf.MapSize[1]-game.map.obstacleCount);
             if (player[i].statistics.bestPercentage<ratio) player[i].statistics.bestPercentage=ratio;
         }
-        setTimeout(game.refreshStatistics, 1000);
+        if (game.isRunning) setTimeout(game.refreshStatistics, 1000);
     }
 
     // id is a string and playerProfile is its profile to be initialized
@@ -131,6 +132,18 @@ function NewGame(server, gameConf, playerConf) {
         }
     }
 
+    game.decideDirection=function(x, y) {
+        var choice="udlr";
+        var stp=Math.floor(Math.random()*4);
+        for (var i=0; i<4; i++) {
+            var tx=x+CONTROL_DIR[choice[(stp+i)%4]][0]*2;
+            var ty=y+CONTROL_DIR[choice[(stp+i)%4]][1]*2;
+            if (tx<0 || ty<0 || tx>=gameConf.MapSize[0] || ty>=gameConf.MapSize[1]) continue;
+            if (game.map.Get(tx, ty)<game.map.NO_OCCUPATION) continue;
+            return choice[(stp+i)%4];
+        }
+        return choice[stp];
+    }
     game.onTick=function() {
         var now=(new Date()).getTime();
         var newMove={};
@@ -146,7 +159,7 @@ function NewGame(server, gameConf, playerConf) {
             }
 
             if (prof.d===STAND_STILL && prof.standFrame<=0) {
-                prof.d=CONTROL_DIR["udlr"[Math.floor(Math.random()*4)]];
+                prof.d=CONTROL_DIR[game.decideDirection(prof.x, prof.y)];
             } else if (prof.standFrame>0) {
                 prof.standFrame--;
             }
@@ -268,14 +281,18 @@ function NewGame(server, gameConf, playerConf) {
             console.warn("CPU cannot catch up with refreshing rate, consider lowering your RPS...");
             nextPoint+=interval;
         }
-        setTimeout(game.onTick, nextPoint-nowPoint);
+        if (game.isRunning) setTimeout(game.onTick, nextPoint-nowPoint);
     }
     game.Start=function() {
         startPoint=(new Date()).getTime();
         nextPoint=startPoint+interval;
+        game.isRunning=true;
         setTimeout(game.onTick, nextPoint-startPoint);
         setTimeout(game.refreshStatistics, 1000);
     };
+    game.Stop=function() {
+        game.isRunning=false;
+    }
 
     return game;
 }
