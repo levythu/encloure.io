@@ -41,7 +41,7 @@ router.get('/getserver', function(req, res) {
         db.getRoom(function(room){
             if (room == null) {
                 // create a new room
-                db.getServer(function(servers){
+                db.getServer(function(err, servers){
                     if (servers.length == 0) {
                         res.status(503).send("No gameserver available");
                         mutex.Unlock();
@@ -49,6 +49,7 @@ router.get('/getserver', function(req, res) {
                     }
                     console.log(servers);
                     availableServer = servers[0].endpoint;
+                    list[availableServer] = servers[0].token;
                     request.post(availableServer+"/newserver", {form: {
                         token: list[availableServer],
                     }}, function(err, response, body) {
@@ -58,7 +59,7 @@ router.get('/getserver', function(req, res) {
                             return;
                         }
                         // add ws to db
-                        db.registerRoom(availableServer, body);
+                        db.registerRoom(availableServer, body, conf.game.defaultMap);
                         res.send(body);
                         mutex.Unlock();
                         return;
@@ -112,17 +113,22 @@ router.post('/createroom', function(req, res){
             }
             // console.log(servers);
             availableServer = servers[0].endpoint;
+            var mapName = req.body.map.toLowerCase().replace(" ", "_");
             // console.log(req.body);
-            db.getMapWithName(req.body.map.toLowerCase().replace(" ", "_"), function(mapDoc){
+            db.getMapWithName(mapName, function(mapDoc){
                 // console.log(mapDoc);
+                var gameConf = mapDoc;
+                gameConf['sprintCD'] = req.body.sprintCD;
+                gameConf['sprintDistance'] = req.body.sprintDistance;
                 request.post(availableServer+"/newserver", {form: {
-                    token: list[availableServer],
-                    roomMap: JSON.stringify(mapDoc),
-                    // {
-                    //     MapSize:    mapDoc.MapSize, // default map size
-                    //     MaxPlayer:  mapDoc.MaxPlayer,
-                    //     map:        mapDoc.map,
-                    // },
+                    token:      list[availableServer],
+                    roomMap:    JSON.stringify(mapDoc),
+                    player:     JSON.stringify({
+                        'sprintCD': parseInt(req.body.sprintCD.substr(0, req.body.sprintCD.length-1)),
+                        'sprintDistance': parseInt(req.body.sprintDistance),
+                        'speed': 1,
+                        'standingFrame' : 6,
+                    }),
                 }}, function(err, response, body) {
                     if (err || Math.floor(response.statusCode/100)!==2) {
                         mutex.Unlock();
@@ -130,7 +136,7 @@ router.post('/createroom', function(req, res){
                         return;
                     }
                     // add ws to db
-                    db.registerRoom(availableServer, body);
+                    db.registerRoom(availableServer, body, mapDoc);
                     res.send(body);
                     mutex.Unlock();
                     return;

@@ -13,22 +13,37 @@ exports.deleteDoc = function(collectionName, doc) {
     db.collection(collectionName).remove(doc, function(){});
 };
 
-exports.registerRoom = function(serverEndpoint, gameEndpoint) {
-    db.collection('gameServers').update(
-        { endpoint:serverEndpoint },
-        {
+exports.registerRoom = function(serverEndpoint, gameEndpoint, mapDoc) {
+    db.collection('gameServers').update({ 
+            endpoint: serverEndpoint 
+        }, {
             $push: { roomIds: gameEndpoint }
+        }, { 
+            multi: false
         }, 
-        { multi: false }, 
         function (){});
-    //TODO: hardcode max players
-    db.collection('rooms').insert(
-        {
-            'serverEndpoint':serverEndpoint,
-            'gameEndpoint':gameEndpoint, 
-            maxPlayers:20, 
-            activePlayers:1
-        }, function(){});
+    
+    db.collection('rooms').find(function (err, docs) {
+        // add unique incremental roomid
+        var roomId = 0
+        if (docs != null){
+            for (var i = 0; i < docs.length; i++){
+                if (docs[i].roomId > roomId){
+                    roomId = docs[i].roomId;
+                }
+            }
+        }
+        roomId++;
+        db.collection('rooms').insert(
+            {
+                roomId:         roomId,
+                serverEndpoint: serverEndpoint,
+                gameEndpoint:   gameEndpoint,
+                maxPlayers:     mapDoc.MaxPlayer,
+                activePlayers:  0,
+                map:            mapDoc,
+            }, function(){});
+    });
 }
 
 exports.unregisterRoom = function(gameEndpoint) {
@@ -64,11 +79,13 @@ exports.unregisterGameServer = function(serverEndpoint) {
 }
 
 exports.updatePlayerNum = function(gameEndpoint, num) {
-    db.collection('rooms').update(
-        {'gameEndpoint': gameEndpoint}, 
-        {$inc: { activePlayers: num }}, 
-        {multi: false}, 
-        function (){});
+    db.collection('rooms').update({
+        gameEndpoint: gameEndpoint
+    }, {
+        $inc: { activePlayers: parseInt(num) }
+    }, {
+        multi: false
+    }, function (){});
 }
 
 exports.getRoom = function(callback) {
@@ -93,13 +110,12 @@ exports.getServer = function(callback) {
           {
              $project: {
                 endpoint: 1,
+                token: 1,
                 numberOfRooms: { $size: "$roomIds" }
              }
           }
         ]
-    ).sort({numberOfRooms:1}, function(err, docs) {
-        callback(docs);
-    });
+    ).sort({numberOfRooms:1}, callback);
 }
 
 exports.db = db
