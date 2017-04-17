@@ -1,6 +1,7 @@
 var conf=require("../settings");
 var Map=require("./map.duo");
 var getname=require("./stupidNameGenerator");
+var gm=require("../gameserver/gamemanager");
 
 var CONTROL_DIR={
     "u":    [0, -1],
@@ -78,6 +79,7 @@ function NewGame(server, gameConf, playerConf) {
             return;
         }
         game.userOnline++;
+        gm.UpdatePlayer(game.endpoint, game.userOnline, 1);
 
         player[id]=playerProfile;
         playerProfile.x=resTuple[0];
@@ -243,6 +245,7 @@ function NewGame(server, gameConf, playerConf) {
             game.map.DeleteColor(-(-i));
             delete player[i];
             game.userOnline--;
+            gm.UpdatePlayer(game.endpoint, game.userOnline, -1);
         }
         for (var i in floodList) {
             game.map.FloodFill(i);

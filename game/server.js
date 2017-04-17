@@ -74,7 +74,9 @@ function NewServer(callback, gameConf, playerConf) {
         }
     }
     var wss = new WebSocket.Server({ port: 0 }, function() {
-        callback("ws://"+conf.server.hostname+":"+wss._server.address().port);
+        server.endpoint="ws://"+conf.server.hostname+":"+wss._server.address().port;
+        g.endpoint=server.endpoint;
+        callback(server.endpoint);
     });
     wss.on('connection', function(ws) {
         ws.once("message", function(msg) {
