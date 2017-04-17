@@ -13,6 +13,16 @@ exports.LaunchGame=function(callback, roomMap, player) {
     }, roomMap, player);
 
 }
+exports.UpdatePlayer=function(endpoint, playerCount, delta) {
+    request.post(conf.server.masterEndPoint+"/gm/updatePlayerNum", {form: {
+        endpoint: endpoint,
+        num: delta,
+        abs: playerCount,
+        secret: conf.server.masterSecret,
+    }}, function(err) {
+        console.error(err);
+    });
+}
 
 function disconnectMaster(err) {
     request.post(conf.server.masterEndPoint+"/gm/unregister", {form: {
