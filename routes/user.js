@@ -33,13 +33,15 @@ router.get('/play', function(req, res){
     }
     if (req.session.author in loggedinUsers){
         db.getAllRooms(function(err, docs){
+            // No available room
             if (docs.length == 0){
-
                 res.render('play', {
                     username: loggedinUsers[req.session.author].username,
+                    rooms: undefined,
                 });
                 return;
             }
+
             rooms = [];
             //TODO: sort by activePlayers
             for(var i in docs) {
@@ -173,7 +175,9 @@ router.get('/getroom', function(req, res){
                 res.redirect('/playground#token='+token+'&type='+type+'&endpoint='+doc.gameEndpoint);
             }
             else{
-                res.redirect('/playground#token='+token+'&type='+type);
+                res.render('play', {
+                    error: 'The room does not exist.'
+                });
             }
             return;
         });
