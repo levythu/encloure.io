@@ -9,7 +9,7 @@ function UnregisterRoom(endpoint) {
         gameEndpoint: endpoint,
         secret: conf.server.masterSecret,
     }}, function(err) {
-        console.error(err);
+        if (err) console.error(err);
     });
 }
 

@@ -45,6 +45,9 @@
 
         map.DigestObstacleMap=function(obmap) {
             var count=0;
+            if (obmap.length!=width) {
+                console.error("Inconsistency obmap and mapsize");
+            }
             for (var i=0; i<width; i++) {
                 for (var j=0; j<height; j++) {
                     if (obmap[i][j]==="1") {

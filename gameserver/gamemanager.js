@@ -20,7 +20,7 @@ exports.UpdatePlayer=function(endpoint, playerCount, delta) {
         abs: playerCount,
         secret: conf.server.masterSecret,
     }}, function(err) {
-        console.error(err);
+        if (err) console.error(err);
     });
 }
 
