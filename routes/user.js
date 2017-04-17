@@ -33,7 +33,7 @@ router.get('/play', function(req, res){
     }
     if (req.session.author in loggedinUsers){
         db.getAllRooms(function(err, docs){
-            if (docs == null){
+            if (docs.length == 0){
 
                 res.render('play', {
                     username: loggedinUsers[req.session.author].username,
@@ -62,16 +62,6 @@ router.get('/play', function(req, res){
         res.redirect('/error');
         return;
     }
-    // userdb.findAccount(req.session.author, function(err, doc) {
-    //     if (doc == null){
-    //         req.session.author = undefined;
-    //         res.redirect('/error');
-    //         return;
-    //     } else{
-    //         res.render('play', {username: doc.username});
-    //         return;
-    //     }
-    // });
 });
 
 router.get('/quickgame', function(req, res){
@@ -102,6 +92,13 @@ router.get('/createroom', function(req, res){
     }
     if (req.session.author in loggedinUsers){
         db.getAllMaps(function(err, docs){
+            if (docs == null){
+                res.render('createroom', {
+                    username: loggedinUsers[req.session.author].username,
+                });
+                return;
+            }
+
             maps = [];
             for(i in docs) {
                 maps.push({
@@ -124,16 +121,6 @@ router.get('/createroom', function(req, res){
         res.redirect('/error');
         return;
     }
-    // userdb.findAccount(req.session.author, function(err, doc) {
-    //     if (doc == null){
-    //         req.session.author = undefined;
-    //         res.redirect('/error');
-    //         return;
-    //     } else{
-    //         res.render('createroom');
-    //         return;
-    //     }
-    // });
 });
 
 router.post('/createroom', function(req, res) {
@@ -188,6 +175,32 @@ router.get('/getroom', function(req, res){
             else{
                 res.redirect('/playground#token='+token+'&type='+type);
             }
+            return;
+        });
+        return;
+    } else {
+        delete loggedinUsers[req.session.author];
+        req.session.author = undefined;
+        res.redirect('/error');
+        return;
+    }
+});
+
+router.get('/getmap', function(req, res){
+    if (req.session.author == undefined){
+        res.redirect('./login');
+        return;
+    }
+    var query = req._parsedOriginalUrl.query;
+    var mapName = query.split("=")[1];
+
+    if (req.session.author in loggedinUsers){
+        db.getMapWithName(mapName, function(err, doc){
+            if (doc == null){
+                res.send("no map");
+                return;
+            }
+            res.send(doc.map);
             return;
         });
         return;
@@ -306,19 +319,6 @@ router.get('/profile', function(req, res) {
         res.redirect('/error');
         return;
     }
-    // userdb.findAccount(req.session.author, function(err, doc) {
-    //     if (doc == null){
-    //         req.session.author = undefined;
-    //         res.redirect('/error');
-    //         return;
-    //     } else{
-    //         res.render('profile', {
-    //             username: doc.username, 
-    //             email: doc.email
-    //         });
-    //         return;
-    //     }
-    // });
 });
 
 router.post('/profile', function(req, res) {
@@ -344,22 +344,6 @@ router.post('/profile', function(req, res) {
         res.redirect('/error');
         return;
     }
-    // userdb.findAccount(req.session.author, function(err, doc) {
-    //     if (doc == null){
-    //         req.session.author = undefined;
-    //         res.redirect('/error');
-    //         return;
-    //     } else{
-    //         userdb.updateAccount(doc.email, 
-    //             req.body.username, function(err, newDoc, lastErrorObject){
-    //             res.render('profile', {
-    //                 username: newDoc.username, 
-    //                 email: newDoc.email
-    //             });
-    //             return;
-    //         });
-    //     }
-    // });
     return;
 });
 

@@ -112,12 +112,10 @@ exports.getAllMaps = function(callback) {
 
 exports.getMapWithName = function(name, callback){
     db.collection('maps').findOne(
-        {name: name}, 
-        function(err, doc){
-            callback(doc);
-    });
+        {name: name}, callback);
 }
 
+// TODO sort with activePlayers or better sorting
 exports.getServer = function(callback) {
     db.collection('gameServers').aggregate(
         [

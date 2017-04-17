@@ -17,7 +17,11 @@ router.post('/register', function(req, res) {
     }
     console.log("Registered: "+req.body.endpoint);
 
-    db.insertDoc('gameServers', {endpoint:req.body.endpoint, token:req.body.token, roomIds:[]});
+    db.insertDoc('gameServers', {
+        endpoint:req.body.endpoint, 
+        token:req.body.token, 
+        roomIds:[]
+    });
     list[req.body.endpoint]=req.body.token;
     res.send("OK.");
 });
@@ -42,7 +46,7 @@ router.get('/getserver', function(req, res) {
             if (room == null) {
                 // create a new room
                 db.getServer(function(err, servers){
-                    if (servers == null) {
+                    if (servers.length == 0) {
                         res.status(503).send("No gameserver available");
                         mutex.Unlock();
                         return;
@@ -107,7 +111,7 @@ router.post('/createroom', function(req, res){
 
     mutex.Lock(function() {
         db.getServer(function(err, servers){
-            if (servers == null) {
+            if (servers.length == 0) {
                 res.status(503).send("No gameserver available");
                 mutex.Unlock();
                 return;
@@ -115,7 +119,7 @@ router.post('/createroom', function(req, res){
             availableServer = servers[0].endpoint;
             var mapName = req.body.map.toLowerCase().replace(" ", "_");
 
-            db.getMapWithName(mapName, function(mapDoc){
+            db.getMapWithName(mapName, function(err, mapDoc){
 
                 list[availableServer] = servers[0].token;
                 request.post(availableServer+"/newserver", {form: {
