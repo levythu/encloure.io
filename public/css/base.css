@@ -10,7 +10,7 @@ html {
   background: #333333;
   color: white;
   font-size: 15px;
-  
+
 }
 label {
   margin-top: 30px;
@@ -59,4 +59,7 @@ label {
 }
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover{
   border: 1px solid #fff;
+}
+.clickable {
+    cursor: pointer;
 }

@@ -15,26 +15,26 @@
                 </div>
                 <div class="panel-body">
 
-                    <form class="form-signin" method="post" action="/TODO">
+                    <form class="form-signin" method="post" action="/user/createroom">
                         <label>Map</label>
                         <br/>
-                        <select class="selectpicker">
-                          <option>Dead Cross</option>
-                          <option>Fuck CSS</option>
-                          <option>The Room</option>
-                          <option>Valor Wins</option>
+                        <select class="selectpicker" id="mapselect" name="map" onchange="loadImage()">
+                          <option>Circular War</option>
+                          <option>Bloody Matrix</option>
+                          <option>Desperate Fight</option>
+                          <option>Recurrent Self</option>
                         </select>
                         <br/>
                         <br/>
                         <label style="margin-top: 15px;">Map Preview:</label><br>
                         <div class="row">
-                            <img style="margin-top: 15px;" width="75%" height="75%" src="../blank.png">
+                            <img style="margin-top: 15px;" id="thumbnail" width="75%" height="75%" src="../maps/circular_war.jpg">
                         </div>
                         <br/>
 
                         <label style="margin-top: 15px;">Sprint Distance</label>
                         <br/>
-                        <select class="selectpicker">
+                        <select class="selectpicker" name="sprintDistance">
                           <option>3</option>
                           <option>5</option>
                           <option>7</option>
@@ -42,9 +42,9 @@
                         </select>
                         <br/>
                         <br/>
-                        <label style="margin-top: 15px;">Sprint CD</label>
+                        <label style="margin-top: 15px;">Sprint Cooldown</label>
                         <br/>
-                        <select class="selectpicker">
+                        <select class="selectpicker" name="sprintCD">
                           <option>1s</option>
                           <option>3s</option>
                           <option>5s</option>
@@ -60,6 +60,7 @@
         <script src="/js/jquery/jquery-1.11.1.min.js"></script>
         <script src="/js/bootstrap/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+        <script type="text/javascript" src="/js/createroom.js"></script>
     </body>
 
 </html>
