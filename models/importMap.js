@@ -1,4 +1,4 @@
-var db = require("./db")
+var db = require("./db");
 
 db.insertDoc('maps', {
   name: 'circular_war',
@@ -31,3 +31,4 @@ db.insertDoc('maps', {
   MaxPlayer: 1,
   map: require("../game/recurrent_self"),
 });
+db.db.close();

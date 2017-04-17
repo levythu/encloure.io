@@ -9,7 +9,9 @@ module.exports={
         defaultMap: {
             MapSize:        [80, 80], // default map size
             MaxPlayer:      20,
-            map: require("./game/exampleMap.circle"),
+            map: require("./game/circular_war"),
+            displayName:    'Circular War',
+            name:           'circular_war',
         },
 
         player:     {
@@ -22,10 +24,10 @@ module.exports={
 
     server: {
         // the public hostname, useful for both gameserver and master
-        hostname: "aws.levy.at",
+        hostname: "ec2-34-207-137-52.compute-1.amazonaws.com",
 
         // will be used only for gameserver, indicating where's the master
-        masterEndPoint: "http://aws.levy.at:4000",
+        masterEndPoint: "http://ec2-34-207-137-52.compute-1.amazonaws.com:4000",
         // useful for both server, gameserver use this to register on master
         masterSecret: "BingoLingo!",
     },
