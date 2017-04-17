@@ -52,16 +52,18 @@ exports.unregisterRoom = function(gameEndpoint) {
             'gameEndpoint':gameEndpoint
         }, 
         function(err, doc) {
-            db.collection('gameServers').update(
-                { endpoint:doc.serverEndpoint },
-                {
-                    $pull: { 
-                        roomIds: gameEndpoint 
-                    }
-                }, 
-                { multi: false }, 
-                function (){});
-        db.collection('rooms').remove(doc, function(){});
+            if (doc != null){
+                db.collection('gameServers').update(
+                    { endpoint:doc.serverEndpoint },
+                    {
+                        $pull: { 
+                            roomIds: gameEndpoint 
+                        }
+                    }, 
+                    { multi: false }, 
+                    function (){});
+                db.collection('rooms').remove(doc, function(){});
+            }
     });
 }
 

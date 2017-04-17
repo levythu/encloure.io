@@ -89,6 +89,7 @@ router.post('/unregisterRoom', function(req, res){
             return;
         }
         db.unregisterRoom(req.body.gameEndpoint);
+        res.send("");
         mutex.Unlock();
     });
 });
@@ -126,7 +127,7 @@ router.post('/createroom', function(req, res){
                     token:      list[availableServer],
                     roomMap:    JSON.stringify(mapDoc),
                     player:     JSON.stringify({
-                        'sprintCD': parseInt(req.body.sprintCD.substr(0, req.body.sprintCD.length-1)),
+                        'sprintCD': parseInt(req.body.sprintCD),
                         'sprintDistance': parseInt(req.body.sprintDistance),
                         'speed': conf.game.player.speed,
                         'standingFrame' : conf.game.player.standingFrame,
