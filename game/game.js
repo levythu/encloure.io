@@ -35,7 +35,7 @@ var PALLET=conf.PALLET;
 // }
 
 // server is a server object from server.js
-function NewGame(server, gameConf=conf.game.defaultMap) {
+function NewGame(server, gameConf, playerConf) {
     var game={};
     var player={};
 
@@ -83,11 +83,11 @@ function NewGame(server, gameConf=conf.game.defaultMap) {
         playerProfile.x=resTuple[0];
         playerProfile.y=resTuple[1];
         playerProfile.d=STAND_STILL;
-        playerProfile.standFrame=conf.game.player.standingFrame;
+        playerProfile.standFrame=playerConf.standingFrame;
         playerProfile.color=PALLET[colorChoosen];
-        playerProfile.speed=conf.game.player.speed;
-        playerProfile.sprintDistance=conf.game.player.sprintDistance;
-        playerProfile.sprintCD=conf.game.player.sprintCD;
+        playerProfile.speed=playerConf.speed;
+        playerProfile.sprintDistance=playerConf.sprintDistance;
+        playerProfile.sprintCD=playerConf.sprintCD;
         playerProfile.remainingsprintCD=0;
         playerProfile.shouldMove=playerProfile.speed;
         if (playerProfile.nick==null) playerProfile.nick=getname();

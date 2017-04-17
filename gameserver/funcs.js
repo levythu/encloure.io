@@ -13,6 +13,8 @@ router.get('/', function(req, res) {
 // Args: [token] - In body form, the token passed when game server registered
 //       [roomMap] - In body form, the stringfied version of JSON, the format is equal to conf.game.defaultMap
 //                   and by default the server will use conf.game.defaultMap
+//       [player] -  In body form, the stringfied version of JSON, the format is equal to conf.game.player
+//                   and by default the server will use conf.game.player
 router.post('/newserver', function(req, res) {
     if (req.body.token!==gm.token) {
         res.status(403).send("Invalid token.");
@@ -27,9 +29,18 @@ router.post('/newserver', function(req, res) {
             return;
         }
     }
-    gm.LaunchGame(function(gamepoint, roomMap) {
+    var player=conf.game.player;
+    if ("player" in req.body) {
+        try {
+            player=JSON.parse(req.body.player);
+        } catch (e) {
+            res.status(400).send("Invalid player configure.");
+            return;
+        }
+    }
+    gm.LaunchGame(function(gamepoint) {
         res.send(gamepoint);
-    });
+    }, roomMap, player);
 });
 
 module.exports = router;
