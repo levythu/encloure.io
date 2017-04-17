@@ -4,14 +4,40 @@ var WebSocket=require("ws");
 
 var request=require("request");
 
+function UnregisterRoom(endpoint) {
+    request.post(conf.server.masterEndPoint+"/gm/unregisterRoom", {form: {
+        gameEndpoint: endpoint,
+        secret: conf.server.masterSecret,
+    }}, function(err) {
+        console.error(err);
+    });
+}
+
 function NewServer(callback, gameConf, playerConf) {
     var count=0;
     var clients={};
 
     var server={};
     var g=game.NewGame(server, gameConf, playerConf);
+    var watchDog=-1;
+    var YellowCard=false;
+
+    function checkForNoUser() {
+        if (Object.keys(clients).length==0) {
+            if (!YellowCard) {
+                YellowCard=true
+            } else {
+                clearInterval(watchDog);
+                console.log("Terminate game at "+server.endpoint);
+                server.wss.close();
+                g.Stop();
+                UnregisterRoom(server.endpoint);
+            }
+        } else {
+            YellowCard=false;
+        }
+    }
     server.onConnect=function(client) {
-        //TODO tell master to update player number
         var tConf={};
         for (i in conf.game) tConf[i]=conf.game[i];
         for (i in gameConf) tConf[i]=gameConf[i];
@@ -42,7 +68,7 @@ function NewServer(callback, gameConf, playerConf) {
         g.onControl(client.profile.id, obj);
     }
     server.onDisconnect=function(client) {
-        //TODO tell master to update player number
+
     }
 
     function waitForValidation(message, succ, fail) {
@@ -75,7 +101,9 @@ function NewServer(callback, gameConf, playerConf) {
     }
     var wss = new WebSocket.Server({ port: 0 }, function() {
         server.endpoint="ws://"+conf.server.hostname+":"+wss._server.address().port;
+        server.wss=wss;
         g.endpoint=server.endpoint;
+        watchDog=setInterval(checkForNoUser, conf.game.GraceTime);
         callback(server.endpoint);
     });
     wss.on('connection', function(ws) {

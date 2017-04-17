@@ -48,6 +48,7 @@ function NewGame(server, gameConf, playerConf) {
     // other per class states
     var colorChoosen=0;
 
+    game.isRunning=false;
     game.position={};
     game.map=Map(gameConf.MapSize[0], gameConf.MapSize[1]);
     if ("map" in gameConf) {
@@ -62,7 +63,7 @@ function NewGame(server, gameConf, playerConf) {
             var ratio=result[i]/(gameConf.MapSize[0]*gameConf.MapSize[1]-game.map.obstacleCount);
             if (player[i].statistics.bestPercentage<ratio) player[i].statistics.bestPercentage=ratio;
         }
-        setTimeout(game.refreshStatistics, 1000);
+        if (game.isRunning) setTimeout(game.refreshStatistics, 1000);
     }
 
     // id is a string and playerProfile is its profile to be initialized
@@ -268,14 +269,18 @@ function NewGame(server, gameConf, playerConf) {
             console.warn("CPU cannot catch up with refreshing rate, consider lowering your RPS...");
             nextPoint+=interval;
         }
-        setTimeout(game.onTick, nextPoint-nowPoint);
+        if (game.isRunning) setTimeout(game.onTick, nextPoint-nowPoint);
     }
     game.Start=function() {
         startPoint=(new Date()).getTime();
         nextPoint=startPoint+interval;
+        game.isRunning=true;
         setTimeout(game.onTick, nextPoint-startPoint);
         setTimeout(game.refreshStatistics, 1000);
     };
+    game.Stop=function() {
+        game.isRunning=false;
+    }
 
     return game;
 }
