@@ -4,6 +4,7 @@ $(function(){
     var KEY_LEFT=37;
     var KEY_RIGHT=39;
     var KEY_SPACE=32;
+    var KEY_ENTER=13;
 
     function keyboardHook(e) {
         var keyPressed=e.keyCode;
@@ -22,6 +23,11 @@ $(function(){
             break;
         case KEY_SPACE:
             N.send({sprint: 1});
+            break;
+        case KEY_ENTER:
+            if (window.__isDead===true) {
+                window.location.reload();
+            }
             break;
         default:
             return;

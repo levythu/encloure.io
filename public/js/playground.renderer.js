@@ -226,7 +226,7 @@ $(function(){
                     "\n"
                 )
             }
-
+            window.__isDead=true;
             setTimeout(function(){
                 OutSider.ShowDeath();
             }, 1500);
