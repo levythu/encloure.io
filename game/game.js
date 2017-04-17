@@ -132,6 +132,18 @@ function NewGame(server, gameConf, playerConf) {
         }
     }
 
+    game.decideDirection=function(x, y) {
+        var choice="udlr";
+        var stp=Math.floor(Math.random()*4);
+        for (var i=0; i<4; i++) {
+            var tx=x+CONTROL_DIR[choice[(stp+i)%4]][0]*2;
+            var ty=y+CONTROL_DIR[choice[(stp+i)%4]][1]*2;
+            if (tx<0 || ty<0 || tx>=gameConf.MapSize[0] || ty>=gameConf.MapSize[1]) continue;
+            if (game.map.Get(tx, ty)<game.map.NO_OCCUPATION) continue;
+            return choice[(stp+i)%4];
+        }
+        return choice[stp];
+    }
     game.onTick=function() {
         var now=(new Date()).getTime();
         var newMove={};
@@ -147,7 +159,7 @@ function NewGame(server, gameConf, playerConf) {
             }
 
             if (prof.d===STAND_STILL && prof.standFrame<=0) {
-                prof.d=CONTROL_DIR["udlr"[Math.floor(Math.random()*4)]];
+                prof.d=CONTROL_DIR[game.decideDirection(prof.x, prof.y)];
             } else if (prof.standFrame>0) {
                 prof.standFrame--;
             }
