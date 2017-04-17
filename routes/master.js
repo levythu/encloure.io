@@ -17,7 +17,11 @@ router.post('/register', function(req, res) {
     }
     console.log("Registered: "+req.body.endpoint);
 
-    db.insertDoc('gameServers', {endpoint:req.body.endpoint, token:req.body.token, roomIds:[]});
+    db.insertDoc('gameServers', {
+        endpoint:req.body.endpoint, 
+        token:req.body.token, 
+        roomIds:[]
+    });
     list[req.body.endpoint]=req.body.token;
     res.send("OK.");
 });
@@ -38,10 +42,10 @@ router.post('/unregister', function(req, res) {
 
 router.get('/getserver', function(req, res) {
     mutex.Lock(function() {
-        db.getRoom(function(room){
+        db.getRoom(function(err, room){
             if (room == null) {
                 // create a new room
-                db.getServer(function(servers){
+                db.getServer(function(err, servers){
                     if (servers.length == 0) {
                         res.status(503).send("No gameserver available");
                         mutex.Unlock();
@@ -49,6 +53,7 @@ router.get('/getserver', function(req, res) {
                     }
                     console.log(servers);
                     availableServer = servers[0].endpoint;
+                    list[availableServer] = servers[0].token;
                     request.post(availableServer+"/newserver", {form: {
                         token: list[availableServer],
                     }}, function(err, response, body) {
@@ -58,7 +63,7 @@ router.get('/getserver', function(req, res) {
                             return;
                         }
                         // add ws to db
-                        db.registerRoom(availableServer, body);
+                        db.registerRoom(availableServer, body, conf.game.defaultMap);
                         res.send(body);
                         mutex.Unlock();
                         return;
@@ -84,20 +89,64 @@ router.post('/unregisterRoom', function(req, res){
             return;
         }
         db.unregisterRoom(req.body.gameEndpoint);
+        res.send("");
         mutex.Unlock();
     });
 });
 
 router.post('/updatePlayerNum', function(req, res) {
     mutex.Lock(function() {
-        console.log(req.body);
         if (req.body.secret!==conf.server.masterSecret) {
             res.status(403).send("Invalid secret.");
             mutex.Unlock();
             return;
         }
-        db.updatePlayerNum(req.body.gameEndpoint, req.body.num);
+        db.updatePlayerNum(req.body.endpoint, req.body.abs);
+        res.send("");
         mutex.Unlock();
+        return;
+    });
+});
+
+router.post('/createroom', function(req, res){
+
+    mutex.Lock(function() {
+        db.getServer(function(err, servers){
+            if (servers.length == 0) {
+                res.status(503).send("No gameserver available");
+                mutex.Unlock();
+                return;
+            }
+            availableServer = servers[0].endpoint;
+            var mapName = req.body.map.toLowerCase().replace(" ", "_");
+
+            db.getMapWithName(mapName, function(err, mapDoc){
+
+                list[availableServer] = servers[0].token;
+                request.post(availableServer+"/newserver", {form: {
+                    token:      list[availableServer],
+                    roomMap:    JSON.stringify(mapDoc),
+                    player:     JSON.stringify({
+                        'sprintCD': parseInt(req.body.sprintCD),
+                        'sprintDistance': parseInt(req.body.sprintDistance),
+                        'speed': conf.game.player.speed,
+                        'standingFrame' : conf.game.player.standingFrame,
+                    }),
+                }}, function(err, response, body) {
+                    if (err || Math.floor(response.statusCode/100)!==2) {
+                        mutex.Unlock();
+                        res.status(503).send("Game server fail to create server.");
+                        return;
+                    }
+
+                    // add ws to db
+                    db.registerRoom(availableServer, body, mapDoc);
+                    res.send(body);
+                    mutex.Unlock();
+                    return;
+                });
+            });
+        });
     });
 });
 

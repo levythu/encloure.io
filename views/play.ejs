@@ -1,49 +1,73 @@
 <% include ./partials/head %>
 
-<body>
-    <ul class="nav nav-tabs">
-        <li role="presentation" class="navbar-right"><a href="/user/logout" class="navbutton">LOGOUT</a></li>
-        <li role="presentation" class="navbar-right"><a href="/user/profile" class="navbutton">PROFILE</a></li>
-        <li role="presentation" class="navbar-right active"><a href="#" class="navbutton">PLAY</a></li>
+    <body>
+        <ul class="nav nav-tabs">
+            <li role="presentation" class="navbar-right"><a href="/user/logout" class="navbutton">LOGOUT</a></li>
+            <li role="presentation" class="navbar-right"><a href="/user/profile" class="navbutton">PROFILE</a></li>
+            <li role="presentation" class="navbar-right active"><a href="#" class="navbutton">PLAY</a></li>
 
-    </ul>
+        </ul>
 
-    <% include ./partials/image %>
-    <div>
-    <h2 class="text-center">Hello, <%= username %> !</h2>
-  </div>
-    <div style="margin-top: 100px;">
-      <div class="col-md-15">&nbsp;</div>
-
-        <div class="col-md-15">
-            <label style="font-size:20px;">Join existing rooms!</label>
-
-            <div class="list-group">
-                <button type="button" class="list-group-item list-group-item-action" style="border-top-left-radius:0;border-top-right-radius: 0;">1&nbsp;&nbsp;&nbsp;&nbsp;Map: abc&nbsp;&nbsp;&nbsp;&nbsp;Players: 9/10</button>
-                <button type="button" class="list-group-item list-group-item-action">2&nbsp;&nbsp;&nbsp;&nbsp;Map: abc&nbsp;&nbsp;&nbsp;&nbsp;Players: 9/10</button>
-                <button type="button" class="list-group-item list-group-item-action">3&nbsp;&nbsp;&nbsp;&nbsp;Map: abc&nbsp;&nbsp;&nbsp;&nbsp;Players: 9/10</button>
-                <button type="button" class="list-group-item list-group-item-action" style="border-bottom-left-radius:0;border-bottom-right-radius: 0;">4&nbsp;&nbsp;&nbsp;&nbsp;Map: abc&nbsp;&nbsp;&nbsp;&nbsp;Players: 9/10</button>
+        <% include ./partials/image %>
+            <div>
+                <h2 class="text-center">Hello, <%= username %> !</h2>
             </div>
-        </div>
-        <div class="col-md-15">&nbsp;</div>
-        <div class="col-md-15">
-            <label style="font-size:20px;">Feeling not Decisive?</label>
-            <form method="get" action="/user/quickgame">
-                <input type="submit" class="btn btn-block mybutton" style="margin-top:10px;" value="QUICK GAME">
-            </form>
-            <br><br>
+            <div style="margin-top: 100px;">
 
-            <label style="font-size:20px;">Feeling Creative?</label>
-            <form method="get" action="/user/createroom">
-                <input type="submit" class="btn btn-block mybutton" style="margin-top:10px;" value="CREATE ROOM">
-            </form>
-            <br><br>
-        </div>
-    </div>
-</div>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="/js/jquery/jquery-1.11.1.min.js"></script>
-    <script src="/js/bootstrap/bootstrap.min.js"></script>
-</body>
+                <div class="col-md-4 col-md-offset-2">
+                    <label style="font-size:20px;">Join existing rooms!</label>
 
-</html>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Map</th>
+                                <th>Player Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <% if (typeof rooms != 'undefined'){ %>
+                            <% for (var i = 0; i < rooms.length; i++){ %>
+                            <tr class="clickable" data-href="/user/getroom?roomId=<%= rooms[i]['roomId'] %>">
+                                <th scope="row"><%= rooms[i]['roomId'] %></th>
+                                <td><%= rooms[i]['map'] %></td>
+                                <td><%= rooms[i]['activePlayers'] %>/<%= rooms[i]['maxPlayers'] %></td>
+                            </tr>
+                            <% } %>
+                        <% } else { %>
+                            <tr class="clickable" data-href="#">
+                                <th scope="row">--</th>
+                                <td>--</td>
+                                <td>--/--</td>
+                            </tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-3 col-md-offset-1">
+                    <label style="font-size:20px;">Feeling not Decisive?</label>
+                    <form method="get" action="/user/quickgame">
+                        <input type="submit" class="btn btn-block mybutton" style="margin-top:10px;" value="QUICK GAME">
+                    </form>
+                    <br><br>
+
+                    <label style="font-size:20px;">Feeling Creative?</label>
+                    <form method="get" action="/user/createroom">
+                        <input type="submit" class="btn btn-block mybutton" style="margin-top:10px;" value="CREATE ROOM">
+                    </form>
+                    <br><br>
+                </div>
+            </div>
+            </div>
+            <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+            <script src="/js/jquery/jquery-1.11.1.min.js"></script>
+            <script src="/js/bootstrap/bootstrap.min.js"></script>
+            <script type="text/javascript">
+                $('tr[data-href]').on("click", function() {
+                    document.location = $(this).data('href');
+                });
+            </script>
+    </body>
+
+    </html>

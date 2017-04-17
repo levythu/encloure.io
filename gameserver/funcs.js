@@ -21,7 +21,7 @@ router.post('/newserver', function(req, res) {
         return;
     }
     var roomMap=conf.game.defaultMap;
-    if ("roomMap" in req.body) {
+    if ('roomMap' in req.body) {
         try {
             roomMap=JSON.parse(req.body.roomMap);
         } catch (e) {
