@@ -38,11 +38,11 @@ router.post('/unregister', function(req, res) {
 
 router.get('/getserver', function(req, res) {
     mutex.Lock(function() {
-        db.getRoom(function(room){
+        db.getRoom(function(err, room){
             if (room == null) {
                 // create a new room
                 db.getServer(function(err, servers){
-                    if (servers.length == 0) {
+                    if (servers == null) {
                         res.status(503).send("No gameserver available");
                         mutex.Unlock();
                         return;
@@ -106,8 +106,8 @@ router.post('/updatePlayerNum', function(req, res) {
 router.post('/createroom', function(req, res){
 
     mutex.Lock(function() {
-        db.getServer(function(servers){
-            if (servers.length == 0) {
+        db.getServer(function(err, servers){
+            if (servers == null) {
                 res.status(503).send("No gameserver available");
                 mutex.Unlock();
                 return;
@@ -117,6 +117,7 @@ router.post('/createroom', function(req, res){
 
             db.getMapWithName(mapName, function(mapDoc){
 
+                list[availableServer] = servers[0].token;
                 request.post(availableServer+"/newserver", {form: {
                     token:      list[availableServer],
                     roomMap:    JSON.stringify(mapDoc),

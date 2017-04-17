@@ -26,21 +26,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="clickable" data-href="http://google.com">
-                                <th scope="row">1</th>
-                                <td>Mark</td>
-                                <td>9/10</td>
+                        <% if (typeof rooms != 'undefined'){ %>
+                            <% for (var i = 0; i < rooms.length; i++){ %>
+                            <tr class="clickable" data-href="/user/getroom?roomId=<%= rooms[i]['roomId'] %>">
+                                <th scope="row"><%= rooms[i]['roomId'] %></th>
+                                <td><%= rooms[i]['map'] %></td>
+                                <td><%= rooms[i]['activePlayers'] %>/<%= rooms[i]['maxPlayers'] %></td>
                             </tr>
-                            <tr class="clickable" data-href="http://google.com">
-                                <th scope="row">2</th>
-                                <td>Jacob</td>
-                                <td>1/10</td>
+                            <% } %>
+                        <% } else { %>
+                            <tr class="clickable" data-href="#">
+                                <th scope="row">--</th>
+                                <td>--</td>
+                                <td>--/--</td>
                             </tr>
-                            <tr class="clickable" data-href="http://google.com">
-                                <th scope="row">3</th>
-                                <td>Larry</td>
-                                <td>3/5</td>
-                            </tr>
+                        <% } %>
                         </tbody>
                     </table>
                 </div>

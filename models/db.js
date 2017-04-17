@@ -91,9 +91,23 @@ exports.updatePlayerNum = function(gameEndpoint, abs) {
 exports.getRoom = function(callback) {
     db.collection('rooms').findOne(
         {$where: "this.activePlayers < this.maxPlayers"}, 
-        function(err, doc){
-            callback(doc);
-    });
+        callback
+    );
+}
+
+exports.getRoomWithId = function(roomId, callback) {
+    db.collection('rooms').findOne(
+        {roomId: parseInt(roomId)}, 
+        callback
+    );
+}
+
+exports.getAllRooms = function(callback) {
+    db.collection('rooms').find(callback);
+}
+
+exports.getAllMaps = function(callback) {
+    db.collection('maps').find(callback);
 }
 
 exports.getMapWithName = function(name, callback){
