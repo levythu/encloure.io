@@ -11,7 +11,7 @@ db.insertDoc('maps', {
 db.insertDoc('maps', {
   name: 'bloody_matrix',
   displayName: 'Bloody Matrix',
-  MapSize: [29,29],
+  MapSize: [41, 41],
   MaxPlayer: 8,
   map: require("../game/bloody_matrix"),
 });
@@ -19,7 +19,7 @@ db.insertDoc('maps', {
 db.insertDoc('maps', {
   name: 'desperate_fight',
   displayName: 'Desperate Fight',
-  MapSize: [7, 20],
+  MapSize: [20, 7],
   MaxPlayer: 2,
   map: require("../game/desperate_fight"),
 });
