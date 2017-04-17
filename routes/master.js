@@ -40,9 +40,11 @@ router.post('/unregister', function(req, res) {
 
 });
 
+// TODO: refractor /getserver and /createroom
 router.get('/getserver', function(req, res) {
     mutex.Lock(function() {
         db.getRoom(function(err, room){
+            // Either no room or all rooms are full
             if (room == null) {
                 // create a new room
                 db.getServer(function(err, servers){
@@ -52,22 +54,35 @@ router.get('/getserver', function(req, res) {
                         return;
                     }
                     console.log(servers);
-                    availableServer = servers[0].endpoint;
-                    list[availableServer] = servers[0].token;
-                    request.post(availableServer+"/newserver", {form: {
-                        token: list[availableServer],
-                        roomId: 1,
-                    }}, function(err, response, body) {
-                        if (err || Math.floor(response.statusCode/100)!==2) {
-                            mutex.Unlock();
-                            res.status(503).send("Game server fail to create server.");
-                            return;
+
+                    db.getAllRooms(function(err, roomDocs) {
+
+                        var roomId = 0
+                        if (roomDocs != null){
+                            for (var i = 0; i < roomDocs.length; i++){
+                                if (roomDocs[i].roomId > roomId){
+                                    roomId = roomDocs[i].roomId;
+                                }
+                            }
                         }
-                        // add ws to db
-                        db.registerRoom(availableServer, body, conf.game.defaultMap, 1);
-                        res.send(body);
-                        mutex.Unlock();
-                        return;
+                        roomId++;
+                        availableServer = servers[0].endpoint;
+                        list[availableServer] = servers[0].token;
+                        request.post(availableServer+"/newserver", {form: {
+                            token: list[availableServer],
+                            roomId: roomId,
+                        }}, function(err, response, body) {
+                            if (err || Math.floor(response.statusCode/100)!==2) {
+                                mutex.Unlock();
+                                res.status(503).send("Game server fail to create server.");
+                                return;
+                            }
+                            // add ws to db
+                            db.registerRoom(availableServer, body, conf.game.defaultMap, roomId);
+                            res.send(body);
+                            mutex.Unlock();
+                            return;
+                        });
                     });
                 });
             } else {

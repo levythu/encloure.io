@@ -139,14 +139,14 @@ router.post('/createroom', function(req, res) {
             var type = "user";
             tokens[token] = {'email': req.session.author,
                             'username': username};
-            if (body != undefined){                            
-                res.redirect('/playground#token='+token+'&type='+type+'&endpoint='+body);
-            }
-            else{
+            if (err || Math.floor(response.statusCode/100)!==2 || body == undefined) {
                 res.redirect('/playground#token='+token+'&type='+type);
             }
+            else{
+                res.redirect('/playground#token='+token+'&type='+type+'&endpoint='+body);
+            }
+            return;
         });
-        return;
     } else {
         delete loggedinUsers[req.session.author];
         req.session.author = undefined;
@@ -175,10 +175,12 @@ router.get('/getroom', function(req, res){
                 res.redirect('/playground#token='+token+'&type='+type+'&endpoint='+doc.gameEndpoint);
             }
             else{
-                res.render('play', {
-                    username: loggedinUsers[req.session.author].username,
-                    error: 'The room does not exist.'
-                });
+                // TODO: may need better handling.
+                res.redirect('./play');
+                // res.render('play', {
+                //     username: loggedinUsers[req.session.author].username,
+                //     error: 'The room does not exist.'
+                // });
             }
             return;
         });
