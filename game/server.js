@@ -4,12 +4,12 @@ var WebSocket=require("ws");
 
 var request=require("request");
 
-function NewServer(callback, gameConf=conf.game.defaultMap) {
+function NewServer(callback, gameConf, playerConf) {
     var count=0;
     var clients={};
 
     var server={};
-    var g=game.NewGame(server, gameConf);
+    var g=game.NewGame(server, gameConf, playerConf);
     server.onConnect=function(client) {
         //TODO tell master to update player number
         var tConf={};
