@@ -10,6 +10,8 @@
     cursor: default;
     margin: 1em;
     text-decoration: none;
+    min-width: 5em;
+    text-align: center;
 }
 .gameButton:hover {
     background-color: #4DB6AC;
@@ -21,4 +23,16 @@
     -webkit-transition: left 0.5s cubic-bezier(0, 0.91, 0.58, 1),right 0.5s cubic-bezier(0, 0.91, 0.58, 1),top 0.5s cubic-bezier(0, 0.91, 0.58, 1),bottom 0.5s cubic-bezier(0, 0.91, 0.58, 1);
     -ms-transition: left 0.5s cubic-bezier(0, 0.91, 0.58, 1),right 0.5s cubic-bezier(0, 0.91, 0.58, 1),top 0.5s cubic-bezier(0, 0.91, 0.58, 1),bottom 0.5s cubic-bezier(0, 0.91, 0.58, 1);
     -moz-transition: left 0.5s cubic-bezier(0, 0.91, 0.58, 1),right 0.5s cubic-bezier(0, 0.91, 0.58, 1),top 0.5s cubic-bezier(0, 0.91, 0.58, 1),bottom 0.5s cubic-bezier(0, 0.91, 0.58, 1);
+}
+
+.transit_in_background {
+    transition: background-color 0.5s cubic-bezier(0, 0.91, 0.58, 1);
+    -webkit-transition: background-color 0.5s cubic-bezier(0, 0.91, 0.58, 1);
+    -ms-transition: background-color 0.5s cubic-bezier(0, 0.91, 0.58, 1);
+    -moz-transition: background-color 0.5s cubic-bezier(0, 0.91, 0.58, 1);
+}
+
+.nonexist {
+    pointer-events: none;
+    visibility: hidden;
 }

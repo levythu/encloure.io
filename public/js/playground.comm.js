@@ -117,9 +117,30 @@ $(function(){
         }
     }
     parseHash();
-    if (params.endpoint==null) {
-        findOneRoom();
-    } else {
-        connectTo(params.endpoint);
+
+    function Start() {
+        if (params.endpoint==null) {
+            findOneRoom();
+        } else {
+            connectTo(params.endpoint);
+        }
     }
+    if (window.localStorage.tutorial==null) window.localStorage.tutorial="3";
+    var nowTime=-(-window.localStorage.tutorial);
+    if (nowTime>0) {
+        Tutorial.Draw();
+        setTimeout(function() {
+            Tutorial.Show(function() {
+                var nowTime2=-(-window.localStorage.tutorial);
+                window.localStorage.tutorial=""+(--nowTime2);
+                Tutorial.Erase();
+                Start();
+            });
+        }, 500)
+    } else {
+        Tutorial.Erase();
+        Start();
+    }
+
+
 });
