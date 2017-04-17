@@ -101,5 +101,45 @@ router.post('/updatePlayerNum', function(req, res) {
     });
 });
 
+router.post('/createroom', function(req, res){
+
+    mutex.Lock(function() {
+        db.getServer(function(servers){
+            if (servers.length == 0) {
+                res.status(503).send("No gameserver available");
+                mutex.Unlock();
+                return;
+            }
+            // console.log(servers);
+            availableServer = servers[0].endpoint;
+            // console.log(req.body);
+            db.getMapWithName(req.body.map.toLowerCase().replace(" ", "_"), function(mapDoc){
+                // console.log(mapDoc);
+                request.post(availableServer+"/newserver", {form: {
+                    token: list[availableServer],
+                    roomMap: JSON.stringify(mapDoc),
+                    // {
+                    //     MapSize:    mapDoc.MapSize, // default map size
+                    //     MaxPlayer:  mapDoc.MaxPlayer,
+                    //     map:        mapDoc.map,
+                    // },
+                }}, function(err, response, body) {
+                    if (err || Math.floor(response.statusCode/100)!==2) {
+                        mutex.Unlock();
+                        res.status(503).send("Game server fail to create server.");
+                        return;
+                    }
+                    // add ws to db
+                    db.registerRoom(availableServer, body);
+                    res.send(body);
+                    mutex.Unlock();
+                    return;
+                });
+
+            });
+        });
+    });
+});
+
 exports.r = router;
 exports.serverlist=list;

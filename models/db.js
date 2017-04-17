@@ -14,17 +14,38 @@ exports.deleteDoc = function(collectionName, doc) {
 };
 
 exports.registerRoom = function(serverEndpoint, gameEndpoint) {
-    db.collection('gameServers').update({endpoint:serverEndpoint},
-        {$push: { roomIds: gameEndpoint }}, {multi: false}, function (){});
+    db.collection('gameServers').update(
+        { endpoint:serverEndpoint },
+        {
+            $push: { roomIds: gameEndpoint }
+        }, 
+        { multi: false }, 
+        function (){});
     //TODO: hardcode max players
-    db.collection('rooms').insert({'serverEndpoint':serverEndpoint,
-    'gameEndpoint':gameEndpoint, maxPlayers:20, activePlayers:1}, function(){});
+    db.collection('rooms').insert(
+        {
+            'serverEndpoint':serverEndpoint,
+            'gameEndpoint':gameEndpoint, 
+            maxPlayers:20, 
+            activePlayers:1
+        }, function(){});
 }
 
 exports.unregisterRoom = function(gameEndpoint) {
-    db.collection('rooms').findOne({'gameEndpoint':gameEndpoint}, function(err, doc) {
-        db.collection('gameServers').update({endpoint:doc.serverEndpoint},
-            {$pull: { roomIds: gameEndpoint }}, {multi: false}, function (){});
+    db.collection('rooms').findOne(
+        {
+            'gameEndpoint':gameEndpoint
+        }, 
+        function(err, doc) {
+            db.collection('gameServers').update(
+                { endpoint:doc.serverEndpoint },
+                {
+                    $pull: { 
+                        roomIds: gameEndpoint 
+                    }
+                }, 
+                { multi: false }, 
+                function (){});
         db.collection('rooms').remove(doc, function(){});
     });
 }
@@ -32,19 +53,37 @@ exports.unregisterRoom = function(gameEndpoint) {
 exports.unregisterGameServer = function(serverEndpoint) {
     db.collection('gameServers').findOne({'endpoint':serverEndpoint}, function(err, doc) {
         for (var id in doc.roomIds) {
-            db.collection('rooms').remove({'gameEndpoint':doc.roomIds[id]}, function(){});
+            db.collection('rooms').remove(
+                {'gameEndpoint':doc.roomIds[id]}, 
+                function(){});
         }
-        db.collection('gameServers').remove({'endpoint':serverEndpoint}, function(){});
+        db.collection('gameServers').remove(
+            {'endpoint':serverEndpoint}, 
+            function(){});
     });
 }
 
 exports.updatePlayerNum = function(gameEndpoint, num) {
-    db.collection('rooms').update({'gameEndpoint': gameEndpoint}, {$inc: { activePlayers: num }}, {multi: false}, function (){});
+    db.collection('rooms').update(
+        {'gameEndpoint': gameEndpoint}, 
+        {$inc: { activePlayers: num }}, 
+        {multi: false}, 
+        function (){});
 }
 
 exports.getRoom = function(callback) {
-    db.collection('rooms').findOne({$where: "this.activePlayers < this.maxPlayers"}, function(err, doc){
-        callback(doc);
+    db.collection('rooms').findOne(
+        {$where: "this.activePlayers < this.maxPlayers"}, 
+        function(err, doc){
+            callback(doc);
+    });
+}
+
+exports.getMapWithName = function(name, callback){
+    db.collection('maps').findOne(
+        {name: name}, 
+        function(err, doc){
+            callback(doc);
     });
 }
 

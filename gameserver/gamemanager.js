@@ -6,11 +6,11 @@ var request=require("request");
 
 exports.token=rand.GenerateRandomString(100);
 
-exports.LaunchGame=function(callback) {
+exports.LaunchGame=function(callback, roomMap=conf.game.defaultMap) {
     server.NewServer(function(gamep) {
         console.log("Launched new game at "+gamep);
         callback(gamep);
-    });
+    }, roomMap);
 
 }
 

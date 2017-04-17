@@ -59,7 +59,7 @@ router.get('/quickgame', function(req, res){
     }
     if (req.session.author in loggedinUsers){
         var username = loggedinUsers[req.session.author].username;
-        var token = randomGen.GenerateUUID(16);
+        var token = encodeURIComponent(randomGen.GenerateUUID(16));
         var type = "user";
         tokens[token] = {'email': req.session.author,
                         'username': username};
@@ -111,6 +111,45 @@ router.get('/createroom', function(req, res){
     //         return;
     //     }
     // });
+});
+
+router.post('/createroom', function(req, res) {
+    if (req.session.author == undefined){
+        res.redirect('./login');
+        return;
+    }
+    if (req.session.author in loggedinUsers){
+        // var username = loggedinUsers[req.session.author].username;
+        // var token = randomGen.GenerateUUID(16);
+        // var type = "user";
+        // tokens[token] = {'email': req.session.author,
+        //                 'username': username};
+        // res.redirect('/playground#token='+token+'&type='+type
+        //     +"&map="+req.body.map+"&sprintcd="+req.body.sprintcd
+        //     +"&sprintdis="+req.body.sprintdis);
+        request.post(conf.server.masterEndPoint+'/gm/createroom', {
+            form: req.body
+        }, function(err, response, body) {
+            var username = loggedinUsers[req.session.author].username;
+            var token = encodeURIComponent(randomGen.GenerateUUID(16));
+            var type = "user";
+            tokens[token] = {'email': req.session.author,
+                            'username': username};
+            if (body != undefined){                            
+                res.redirect('/playground#token='+token+'&type='+type+'&endpoint='+body);
+            }
+            else{
+                res.redirect('/playground#token='+token+'&type='+type);
+            }
+        });
+        return;
+    } else {
+        delete loggedinUsers[req.session.author];
+        req.session.author = undefined;
+        res.redirect('/error');
+        return;
+    }
+    return;
 });
 
 router.get('/register', function(req, res) {

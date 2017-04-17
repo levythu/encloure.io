@@ -19,7 +19,7 @@ router.post('/newserver', function(req, res) {
         return;
     }
     var roomMap=conf.game.defaultMap;
-    if ("roomMap" in req.body) {
+    if ('roomMap' in req.body) {
         try {
             roomMap=JSON.parse(req.body.roomMap);
         } catch (e) {
@@ -27,9 +27,9 @@ router.post('/newserver', function(req, res) {
             return;
         }
     }
-    gm.LaunchGame(function(gamepoint, roomMap) {
+    gm.LaunchGame(function(gamepoint) {
         res.send(gamepoint);
-    });
+    }, roomMap);
 });
 
 module.exports = router;
