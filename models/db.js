@@ -13,7 +13,7 @@ exports.deleteDoc = function(collectionName, doc) {
     db.collection(collectionName).remove(doc, function(){});
 };
 
-exports.registerRoom = function(serverEndpoint, gameEndpoint, mapDoc) {
+exports.registerRoom = function(serverEndpoint, gameEndpoint, mapDoc, roomId) {
     db.collection('gameServers').update({ 
             endpoint: serverEndpoint 
         }, {
@@ -21,28 +21,18 @@ exports.registerRoom = function(serverEndpoint, gameEndpoint, mapDoc) {
         }, { 
             multi: false
         }, 
-        function (){});
+        function (){     
+    });
     
-    db.collection('rooms').find(function (err, docs) {
-        // add unique incremental roomid
-        var roomId = 0
-        if (docs != null){
-            for (var i = 0; i < docs.length; i++){
-                if (docs[i].roomId > roomId){
-                    roomId = docs[i].roomId;
-                }
-            }
-        }
-        roomId++;
-        db.collection('rooms').insert(
-            {
-                roomId:         roomId,
-                serverEndpoint: serverEndpoint,
-                gameEndpoint:   gameEndpoint,
-                maxPlayers:     mapDoc.MaxPlayer,
-                activePlayers:  0,
-                map:            mapDoc,
-            }, function(){});
+    db.collection('rooms').insert(
+        {
+            roomId:         roomId,
+            serverEndpoint: serverEndpoint,
+            gameEndpoint:   gameEndpoint,
+            maxPlayers:     mapDoc.MaxPlayer,
+            activePlayers:  0,
+            map:            mapDoc,
+        }, function(){
     });
 }
 

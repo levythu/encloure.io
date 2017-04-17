@@ -176,6 +176,7 @@ router.get('/getroom', function(req, res){
             }
             else{
                 res.render('play', {
+                    username: loggedinUsers[req.session.author].username,
                     error: 'The room does not exist.'
                 });
             }
