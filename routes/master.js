@@ -91,14 +91,15 @@ router.post('/unregisterRoom', function(req, res){
 
 router.post('/updatePlayerNum', function(req, res) {
     mutex.Lock(function() {
-        console.log(req.body);
         if (req.body.secret!==conf.server.masterSecret) {
             res.status(403).send("Invalid secret.");
             mutex.Unlock();
             return;
         }
-        db.updatePlayerNum(req.body.gameEndpoint, req.body.num);
+        db.updatePlayerNum(req.body.endpoint, req.body.abs);
+        res.send("");
         mutex.Unlock();
+        return;
     });
 });
 
@@ -111,23 +112,19 @@ router.post('/createroom', function(req, res){
                 mutex.Unlock();
                 return;
             }
-            // console.log(servers);
             availableServer = servers[0].endpoint;
             var mapName = req.body.map.toLowerCase().replace(" ", "_");
-            // console.log(req.body);
+
             db.getMapWithName(mapName, function(mapDoc){
-                // console.log(mapDoc);
-                var gameConf = mapDoc;
-                gameConf['sprintCD'] = req.body.sprintCD;
-                gameConf['sprintDistance'] = req.body.sprintDistance;
+
                 request.post(availableServer+"/newserver", {form: {
                     token:      list[availableServer],
                     roomMap:    JSON.stringify(mapDoc),
                     player:     JSON.stringify({
                         'sprintCD': parseInt(req.body.sprintCD.substr(0, req.body.sprintCD.length-1)),
                         'sprintDistance': parseInt(req.body.sprintDistance),
-                        'speed': 1,
-                        'standingFrame' : 6,
+                        'speed': conf.game.player.speed,
+                        'standingFrame' : conf.game.player.standingFrame,
                     }),
                 }}, function(err, response, body) {
                     if (err || Math.floor(response.statusCode/100)!==2) {
@@ -135,13 +132,13 @@ router.post('/createroom', function(req, res){
                         res.status(503).send("Game server fail to create server.");
                         return;
                     }
+
                     // add ws to db
                     db.registerRoom(availableServer, body, mapDoc);
                     res.send(body);
                     mutex.Unlock();
                     return;
                 });
-
             });
         });
     });

@@ -78,11 +78,11 @@ exports.unregisterGameServer = function(serverEndpoint) {
     });
 }
 
-exports.updatePlayerNum = function(gameEndpoint, num) {
+exports.updatePlayerNum = function(gameEndpoint, abs) {
     db.collection('rooms').update({
         gameEndpoint: gameEndpoint
     }, {
-        $inc: { activePlayers: parseInt(num) }
+        $set: { activePlayers: parseInt(abs) }
     }, {
         multi: false
     }, function (){});
