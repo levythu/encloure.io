@@ -38,7 +38,10 @@ router.post('/newserver', function(req, res) {
             return;
         }
     }
-    gm.LaunchGame(function(gamepoint) {
+    gm.LaunchGame(function(gamepoint, theserver) {
+        if ("roomId" in req.body) {
+            theserver.g.roomId=req.body.roomId;
+        }
         res.send(gamepoint);
     }, roomMap, player);
 });

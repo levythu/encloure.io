@@ -109,6 +109,7 @@ function NewGame(server, gameConf, playerConf) {
             join: player,
             maprever: game.map._r,
             map: ("map" in gameConf?gameConf.map:null),
+            roomId: game.roomId?game.roomId:"Unknown",
             _init: true,
             _epic: now,
         });

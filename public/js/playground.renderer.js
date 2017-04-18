@@ -352,6 +352,7 @@ $(function(){
             setInterval(renderFrame, 1000/globalConf.FPS);
             inited=true;
             setInterval(renderScoreboard, 1000);
+            document.title="Room #"+obj.roomId+" - Enclosure.io"
         }
         if (!inited) return;
         if ("join" in obj) {

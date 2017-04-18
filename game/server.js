@@ -104,7 +104,7 @@ function NewServer(callback, gameConf, playerConf) {
         server.wss=wss;
         g.endpoint=server.endpoint;
         watchDog=setInterval(checkForNoUser, conf.game.GraceTime);
-        callback(server.endpoint);
+        callback(server.endpoint, server);
     });
     wss.on('connection', function(ws) {
         ws.once("message", function(msg) {
