@@ -2,6 +2,11 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+@font-face {
+    font-family: "fffforwa";
+    src: url("../FFFFORWA.TTF") format("truetype");
+}
+
 .maxSize {
     position: absolute;
     width: 800px;

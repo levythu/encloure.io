@@ -130,6 +130,10 @@ function NewGame(server, gameConf, playerConf) {
             if (obj.sprint) {
                 if (player[id].remainingsprintCD===0) player[id].sprinting=true;
             }
+            if (obj.hey) {
+                if (obj.hey.length>10) obj.hey.length=10;
+                player[id].hey=obj.hey;
+            }
         }
     }
 
@@ -152,6 +156,7 @@ function NewGame(server, gameConf, playerConf) {
         var floodList={};
         var die={};
         var enableSprint={};
+        var hey={};
         for (i in player) {
             var prof=player[i];
             if ("nextd" in prof) {
@@ -177,6 +182,11 @@ function NewGame(server, gameConf, playerConf) {
             if (prof.shouldMove>0) continue;
             prof.shouldMove=prof.speed;
             shouldBC=true;
+
+            if (prof.hey) {
+                hey[i]=prof.hey;
+                prof.hey=null;
+            }
 
             function _mv() {
                 prof.x=prof.x+prof.d[0];
@@ -272,6 +282,7 @@ function NewGame(server, gameConf, playerConf) {
                 enclose: floodList,
                 die: die,
                 sprint: enableSprint,
+                hey: hey,
                 _epic: now,
             });
         }

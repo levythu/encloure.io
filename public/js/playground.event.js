@@ -5,6 +5,20 @@ $(function(){
     var KEY_RIGHT=39;
     var KEY_SPACE=32;
     var KEY_ENTER=13;
+    var KEY_A=65;
+    var KEY_S=83;
+    var KEY_D=68;
+    var KEY_Q=81;
+    var KEY_W=87;
+    var KEY_E=69;
+
+    var lastTime=0;
+    function sendWord(word) {
+        var now=(new Date()).getTime();
+        if (now-lastTime<=1000) return;
+        lastTime=now;
+        N.send({hey: word});
+    }
 
     function keyboardHook(e) {
         var keyPressed=e.keyCode;
@@ -28,6 +42,24 @@ $(function(){
             if (window.__isDead===true) {
                 window.location.reload();
             }
+            break;
+        case KEY_A:
+            sendWord("Hey!");
+            break;
+        case KEY_S:
+            sendWord("Good Game");
+            break;
+        case KEY_D:
+            sendWord("I'm Sorry");
+            break;
+        case KEY_Q:
+            sendWord("😂😂😂");
+            break;
+        case KEY_W:
+            sendWord("😡😡😡");
+            break;
+        case KEY_E:
+            sendWord("😏😏😏");
             break;
         default:
             return;

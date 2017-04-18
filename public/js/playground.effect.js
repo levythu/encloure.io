@@ -81,8 +81,31 @@ $(function() {
     };
 
 
+    function Hey(x, y, word) {
+        this.x=x;
+        this.y=y;
+        this.sy=-2;
+        this.ttl=40;
+        this.w=word;
+    }
+    Hey.prototype.onRender=function(canvas) {
+        canvas.save();
+        canvas.textAlign="center";
+        canvas.font="20px fffforwa";
+        canvas.fillStyle="#000000";
+        canvas.fillText(this.w, this.x, this.y);
+        canvas.restore();
+        this.y+=this.sy;
+        this.ttl--;
+        if (this.ttl<=0) {
+            delete entities[this.id];
+        }
+    }
+
+
     Effect.SparkFlake=SparkFlake;
     Effect.Debris=Debris;
+    Effect.Hey=Hey;
     Effect._e=entities;
 
 });

@@ -213,6 +213,13 @@ $(function(){
             }
 
         }
+        if ("_hey" in mv) {
+            for (var i in mv._hey) {
+                if (!players[i]) continue;
+                var basex=players[i].x*renderAmplification+renderAmplification/2;
+                Effect.Add(new Effect.Hey(basex+marginForCanvas, (players[i].y*renderAmplification-14)+marginForCanvas, mv._hey[i]));
+            }
+        }
         if (idie) {
             N.close();
             if (finalStatistics) {
@@ -395,6 +402,9 @@ $(function(){
         if ("sprint" in obj) {
             if (globalConf.profile.id in obj.sprint)
                 obj.move._sprint=true;
+        }
+        if ("hey" in obj) {
+            obj.move._hey=obj.hey;
         }
         if ("move" in obj) {
             moves.EnQueue(obj.move);
