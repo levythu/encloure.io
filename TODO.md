@@ -2,3 +2,4 @@
 - [ ] Global scoreboard, battle history
 - [ ] Change name
 - [ ] Lobby frontend refinement?
+- [x] Intelligent quick game & not refind game in specified mode 

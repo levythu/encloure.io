@@ -8,6 +8,7 @@ var _URL={};
 
 $(function(){
     var params={};
+    var specifyRoom=true;
     function parseHash() {
         params={};
         _URL.params=params;
@@ -34,10 +35,21 @@ $(function(){
         }
         return result;
     }
+
+    var numberOfFinding=0;
+    var forceCreate=5;
     function findOneRoom() {
-        $("#loadingCaption").text("Finding one available room...");
+        numberOfFinding++;
+        var API="/gm/getserver";
+        if (numberOfFinding>=forceCreate) {
+            $("#loadingCaption").text("Seems most rooms are busy, we are creating a room for you instead...");
+            API+="?forcecreate=true";
+        } else {
+            $("#loadingCaption").text("Finding one available room...");
+        }
+
         console.log("Finding rooms...")
-        $.get("/gm/getserver", function(data) {
+        $.get(API, function(data) {
             params.endpoint=data;
             window.location.hash=generateHash();
             connectTo(data);
@@ -65,8 +77,12 @@ $(function(){
 
         connection.onerror = function(error) {
             if (!hasInitiated) {
-                $("#loadingCaption").text("☹ Fail to join the room, we are trying to get another one...");
-                setTimeout(findOneRoom, 500);
+                if (specifyRoom) {
+                    $("#loadingCaption").text("☹ Fail to join this room. You can wait a while, or create a room instead.");
+                } else {
+                    $("#loadingCaption").text("☹ Fail to join the room, we are trying to get another one...");
+                    setTimeout(findOneRoom, 500);
+                }
                 return;
             }
             console.log('WebSocket Error ' + error);
@@ -84,12 +100,16 @@ $(function(){
             if (!hasInitiated) {
                 globalConf=res;
                 if (typeof(globalConf.profile._fail)=="string") {
-                    // TODO in speficy-room mode it may be a prompt, instead of searching another room
                     connection.close();
-                    // TODO room-full info will be alerted... not correct
-                    $("#loadingCaption").text("☹ "+globalConf.profile._fail+". We are trying to get another one...");
-                    console.log("Encounter with fail: "+globalConf.profile._fail);
-                    setTimeout(findOneRoom, 500);
+                    if (specifyRoom) {
+                        $("#loadingCaption").text("☹ "+globalConf.profile._fail+". You can wait a while & refresh, or create a room instead.");
+                        console.log("Encounter with fail: "+globalConf.profile._fail);
+                    }
+                    else {
+                        $("#loadingCaption").text("☹ "+globalConf.profile._fail+". We are trying to get another one...");
+                        console.log("Encounter with fail: "+globalConf.profile._fail);
+                        setTimeout(findOneRoom, 500);
+                    }
                     return;
                 }
 
@@ -120,6 +140,7 @@ $(function(){
 
     function Start() {
         if (params.endpoint==null) {
+            specifyRoom=false;
             findOneRoom();
         } else {
             connectTo(params.endpoint);
