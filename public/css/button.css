@@ -51,6 +51,10 @@ table {
     font-size: 1.3em;
 }
 
+.hoverTable tr:hover {
+    background-color: #3a3a3a !important;
+}
+
 .blueHead {
     background: #3f51b5 !important;
 }
