@@ -7,9 +7,9 @@ var request=require("request");
 exports.token=rand.GenerateRandomString(100);
 
 exports.LaunchGame=function(callback, roomMap, player) {
-    server.NewServer(function(gamep) {
+    server.NewServer(function(gamep, theserver) {
         console.log("Launched new game at "+gamep);
-        callback(gamep);
+        callback(gamep, theserver);
     }, roomMap, player);
 
 }

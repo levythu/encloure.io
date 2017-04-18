@@ -19,6 +19,7 @@ function NewServer(callback, gameConf, playerConf) {
 
     var server={};
     var g=game.NewGame(server, gameConf, playerConf);
+    server._g=g;
     var watchDog=-1;
     var YellowCard=false;
 

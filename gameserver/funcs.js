@@ -40,7 +40,7 @@ router.post('/newserver', function(req, res) {
     }
     gm.LaunchGame(function(gamepoint, theserver) {
         if ("roomId" in req.body) {
-            theserver.g.roomId=req.body.roomId;
+            theserver._g.roomId=req.body.roomId;
         }
         res.send(gamepoint);
     }, roomMap, player);
