@@ -1,0 +1,3 @@
+- [ ] Randomize the quick game room choice
+- [ ] Global scoreboard, battle history
+- [ ] Change name
