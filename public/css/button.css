@@ -4,7 +4,7 @@
     background-color: #eaec4b;
     border-bottom: 6px solid #a1a130;
     color: #888a34;
-    font-size: 25px;
+    font-size: 20px;
     border-radius: 0px;
     font-family: "fffforwa", Verdana, Tahoma;
 }
@@ -45,4 +45,21 @@
 .col-md-15 {
     width: 20%;
     float: left;
+}
+table {
+    margin-top: 10px;
+    font-size: 1.3em;
+}
+
+.blueHead {
+    background: #3f51b5 !important;
+}
+
+.blueHead th {
+    border-bottom: 5px solid #303f9f !important;
+}
+
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    line-height: 2 !important;
+    border-top: 1px solid #3a3a3a !important;
 }
