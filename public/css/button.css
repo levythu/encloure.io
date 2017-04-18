@@ -51,7 +51,7 @@ table {
     font-size: 1.3em;
 }
 
-.hoverTable tr:hover {
+.hoverTable tbody tr:hover {
     background-color: #3a3a3a !important;
 }
 
