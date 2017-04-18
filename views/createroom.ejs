@@ -19,10 +19,11 @@
                         <label>Map</label>
                         <br/>
                         <select class="selectpicker" id="mapselect" name="map" onchange="loadImage()">
-                          <option>Circular War</option>
-                          <option>Bloody Matrix</option>
-                          <option>Desperate Fight</option>
-                          <option>Recurrent Self</option>
+                          <% if (typeof maps != 'undefined'){ %>
+                            <% for (var i = 0; i < maps.length; i++){ %>
+                              <option><%= maps[i]['displayName'] %></option>
+                            <% } %>
+                          <% } %>
                         </select>
                         <br/>
                         <br/>
