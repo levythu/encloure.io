@@ -46,7 +46,14 @@ function NewGame(server, gameConf, playerConf) {
     var interval=1000/conf.game.RPS;
 
     // other per class states
-    var colorChoosen=0;
+    var freeColors=[];
+    for (var i=0; i<PALLET.length; i++) freeColors.push(PALLET[i]);
+    for (var i=freeColors.length; i>0; i--) {
+        var pos=Math.floor(Math.random()*i);
+        var t=freeColors[i-1];
+        freeColors[i-1]=freeColors[pos];
+        freeColors[pos]=t;
+    }
 
     game.isRunning=false;
     game.position={};
@@ -87,14 +94,17 @@ function NewGame(server, gameConf, playerConf) {
         playerProfile.y=resTuple[1];
         playerProfile.d=STAND_STILL;
         playerProfile.standFrame=playerConf.standingFrame;
-        playerProfile.color=PALLET[colorChoosen];
+        if (freeColors.length>0) {
+            playerProfile.color=freeColors.pop();
+        } else {
+            playerProfile.color=PALLET[Math.floor(Math.random()*PALLET.length)];
+        }
         playerProfile.speed=playerConf.speed;
         playerProfile.sprintDistance=playerConf.sprintDistance;
         playerProfile.sprintCD=playerConf.sprintCD;
         playerProfile.remainingsprintCD=0;
         playerProfile.shouldMove=playerProfile.speed;
         if (playerProfile.nick==null) playerProfile.nick=getname();
-        colorChoosen=(colorChoosen+1)%PALLET.length;
 
         game.map.SpawnNew(playerProfile.x, playerProfile.y, -(-id));
 
@@ -267,6 +277,7 @@ function NewGame(server, gameConf, playerConf) {
                 }
             });
             game.map.DeleteColor(-(-i));
+            freeColors.push(player[i].color);
             delete player[i];
             game.userOnline--;
             gm.UpdatePlayer(game.endpoint, game.userOnline, -1);
