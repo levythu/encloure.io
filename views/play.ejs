@@ -25,13 +25,13 @@
                                 <th>Active Players</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="rooms">
                         <% if (typeof rooms != 'undefined'){ %>
                             <% for (var i = 0; i < rooms.length; i++){ %>
                             <tr class="clickable" data-href="/user/getroom?roomId=<%= rooms[i]['roomId'] %>">
                                 <th scope="row"><%= rooms[i]['roomId'] %></th>
                                 <td><%= rooms[i]['map'] %></td>
-                                <td><%= rooms[i]['activePlayers'] %>/<%= rooms[i]['maxPlayers'] %></td>
+                                <td class="player"><%= rooms[i]['activePlayers'] %>/<%= rooms[i]['maxPlayers'] %></td>
                             </tr>
                             <% } %>
                         <% } else { %>
@@ -64,6 +64,15 @@
             <script src="/js/jquery/jquery-1.11.1.min.js"></script>
             <script src="/js/bootstrap/bootstrap.min.js"></script>
             <script type="text/javascript">
+                $("#rooms").children().each(function() {
+                  var player = $(this).find('.player').text().split('/');
+                  if (!isNaN(player[0])) {
+                    if (player[0] === player[1]) {
+                      $(this).removeClass('clickable');
+                      $(this).removeAttr('data-href');
+                    }
+                  }
+                })
                 $('tr[data-href]').on("click", function() {
                     document.location = $(this).data('href');
                 });
