@@ -11,6 +11,7 @@ $(function(){
     var KEY_Q=81;
     var KEY_W=87;
     var KEY_E=69;
+    var KEY_CTRL=17;
 
     var lastTime=0;
     function sendWord(word) {
@@ -61,6 +62,11 @@ $(function(){
         case KEY_E:
             sendWord("😏😏😏");
             break;
+        case KEY_CTRL:
+            if (window.localStorage.word2Say && window.localStorage.word2Say.length>0) {
+                sendWord(window.localStorage.word2Say);
+                break;
+            }
         default:
             return;
         }
