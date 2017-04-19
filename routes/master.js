@@ -6,6 +6,7 @@ var request=require("request");
 var conf=require("../settings");
 var Lock=require("../utils/lock");
 var db=require("../models/db");
+var user=require("./user");
 
 
 var list={};
@@ -18,8 +19,8 @@ router.post('/register', function(req, res) {
     console.log("Registered: "+req.body.endpoint);
 
     db.insertDoc('gameServers', {
-        endpoint:req.body.endpoint, 
-        token:req.body.token, 
+        endpoint:req.body.endpoint,
+        token:req.body.token,
         roomIds:[]
     });
     list[req.body.endpoint]=req.body.token;
@@ -124,6 +125,28 @@ router.post('/updatePlayerNum', function(req, res) {
     });
 });
 
+router.post('/persistGameHistory', function(req,res) {
+  mutex.Lock(function() {
+    if (req.body.secret!==conf.server.masterSecret) {
+        res.status(403).send("Invalid secret.");
+        mutex.Unlock();
+        return;
+    }
+    // verify user
+    if (req.body.token in user.tokens) {
+      db.persistGameHistory({
+        email : user.tokens[req.body.token].email,
+        percentage : req.body.percentage,
+        kill : req.body.kill,
+        time : req.body.time,
+      });
+    } else {
+      res.status(403).send("Invalid user token.");
+    }
+    mutex.Unlock();
+    return;
+  });
+});
 router.post('/createroom', function(req, res){
 
     mutex.Lock(function() {

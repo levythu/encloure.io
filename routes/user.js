@@ -45,12 +45,12 @@ router.get('/play', function(req, res) {
             rooms = [];
             fullrooms = [];
             //TODO: sort by activePlayers
-            docs.sort(function(a,b) {
-              if (a.roomId < b.roomId)
-                return -1;
-              else if (a.roomId > b.roomId)
-                return 1;
-              return 0;
+            docs.sort(function(a, b) {
+                if (a.roomId < b.roomId)
+                    return -1;
+                else if (a.roomId > b.roomId)
+                    return 1;
+                return 0;
             });
             for (var i in docs) {
                 if (docs[i].activePlayers === docs[i].maxPlayers) {
@@ -349,12 +349,25 @@ router.get('/profile', function(req, res) {
         return;
     }
     if (req.session.author in loggedinUsers) {
-        var username = loggedinUsers[req.session.author].username;
-        res.render('profile', {
+      db.getAllMaps(function(err, docs) {
+          if (docs == null) {
+              res.render('profile');
+              return;
+          }
+
+          maps = [];
+          for (i in docs) {
+              maps.push(docs[i].displayName);
+          }
+          var username = loggedinUsers[req.session.author].username;
+          res.render('profile', {
             username: username,
-            email: req.session.author
-        });
-        return;
+            email: req.session.author,
+            maps: maps,
+          });
+          return;
+      });
+      return;
     } else {
         delete loggedinUsers[req.session.author];
         req.session.author = undefined;
@@ -388,6 +401,98 @@ router.post('/profile', function(req, res) {
         return;
     }
     return;
+});
+
+router.get('/leaderboard', function(req, res) {
+  if (req.session.author == undefined) {
+      res.redirect('./login');
+      return;
+  }
+  if (req.session.author in loggedinUsers) {
+      db.getAllMaps(function(err, docs) {
+          if (docs == null) {
+              res.render('leaderboard');
+              return;
+          }
+
+          maps = [];
+          for (i in docs) {
+              maps.push(docs[i].displayName);
+          }
+          res.render('leaderboard', {
+              maps: maps,
+          });
+          return;
+      });
+      return;
+  } else {
+      delete loggedinUsers[req.session.author];
+      req.session.author = undefined;
+      res.redirect('/error');
+      return;
+  }
+});
+
+//TODO
+router.get('/getLeaderboard', function(req, res) {
+    if (req.session.author == undefined) {
+        res.redirect('./login');
+        return;
+    }
+    console.log(req.query.map);
+    res.send({
+        killer: [{
+            name: "harlen",
+            number: 999
+        },{
+            name: "harle",
+            number: 998
+        },{
+            name: "harl",
+            number: 997
+        }],
+        enclosure: [{
+            name: "harlen",
+            number: "99.9%"
+        },{
+            name: "harle",
+            number: "99.8%"
+        },{
+            name: "harl",
+            number: "99.7%"
+        }]
+    });
+});
+
+//TODO
+router.get('/getPersonalBests', function(req, res) {
+    if (req.session.author == undefined) {
+        res.redirect('./login');
+        return;
+    }
+    console.log(req.query.map);
+    res.send({
+        killer: [{
+            name: "harlen",
+            number: 999
+        },{
+            name: "harle",
+            number: 998
+        },{
+            name: "harl",
+            number: 997
+        }],
+        enclosure: [{
+            name: "harlen",
+            number: "99.9%"
+        },{
+            name: "harle",
+            number: "99.8%"
+        },{
+            name: "harl",
+            number: "99.7%"
+        }]
+    });
 });
 
 // TODO

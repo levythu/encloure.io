@@ -15,6 +15,14 @@
     border-bottom: 6px solid #a1a130;
 }
 
+.activebutton {
+  color: black;
+
+}
+.activebutton:hover {
+  color: black;
+}
+
 .noborder {
     border-radius: 0px;
 }

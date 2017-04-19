@@ -14,16 +14,16 @@ exports.deleteDoc = function(collectionName, doc) {
 };
 
 exports.registerRoom = function(serverEndpoint, gameEndpoint, mapDoc, roomId) {
-    db.collection('gameServers').update({ 
-            endpoint: serverEndpoint 
+    db.collection('gameServers').update({
+            endpoint: serverEndpoint
         }, {
             $push: { roomIds: gameEndpoint }
-        }, { 
+        }, {
             multi: false
-        }, 
-        function (){     
+        },
+        function (){
     });
-    
+
     db.collection('rooms').insert(
         {
             roomId:         roomId,
@@ -40,17 +40,17 @@ exports.unregisterRoom = function(gameEndpoint) {
     db.collection('rooms').findOne(
         {
             'gameEndpoint':gameEndpoint
-        }, 
+        },
         function(err, doc) {
             if (doc != null){
                 db.collection('gameServers').update(
                     { endpoint:doc.serverEndpoint },
                     {
-                        $pull: { 
-                            roomIds: gameEndpoint 
+                        $pull: {
+                            roomIds: gameEndpoint
                         }
-                    }, 
-                    { multi: false }, 
+                    },
+                    { multi: false },
                     function (){});
                 db.collection('rooms').remove(doc, function(){});
             }
@@ -61,11 +61,11 @@ exports.unregisterGameServer = function(serverEndpoint) {
     db.collection('gameServers').findOne({'endpoint':serverEndpoint}, function(err, doc) {
         for (var id in doc.roomIds) {
             db.collection('rooms').remove(
-                {'gameEndpoint':doc.roomIds[id]}, 
+                {'gameEndpoint':doc.roomIds[id]},
                 function(){});
         }
         db.collection('gameServers').remove(
-            {'endpoint':serverEndpoint}, 
+            {'endpoint':serverEndpoint},
             function(){});
     });
 }
@@ -80,6 +80,10 @@ exports.updatePlayerNum = function(gameEndpoint, abs) {
     }, function (){});
 }
 
+exports.persistGameHistory = function(doc) {
+  db.collection('gameHistory').insert(doc, function(){});
+}
+
 exports.getAvailableRooms = function(callback) {
     db.collection('rooms').find(
     {
@@ -89,7 +93,7 @@ exports.getAvailableRooms = function(callback) {
 
 exports.getRoomWithId = function(roomId, callback) {
     db.collection('rooms').findOne(
-        {roomId: parseInt(roomId)}, 
+        {roomId: parseInt(roomId)},
         callback
     );
 }

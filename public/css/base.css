@@ -63,3 +63,7 @@ label {
 .clickable {
     cursor: pointer;
 }
+.inlineblock {
+  display:inline-block;
+  width: auto;
+}
