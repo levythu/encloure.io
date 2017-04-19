@@ -280,7 +280,7 @@ function NewGame(server, gameConf, playerConf) {
 
             game.map.DeleteColor(-(-i));
             if (i in server.tokenMap) {
-                gm.SubmitHistory(server.tokenMap[i], his);
+                gm.SubmitHistory(server.tokenMap[i], his, game.endpoint);
                 delete server.tokenMap[i];
             }
             freeColors.push(player[i].color);

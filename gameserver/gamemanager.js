@@ -23,13 +23,14 @@ exports.UpdatePlayer=function(endpoint, playerCount, delta) {
         if (err) console.error(err);
     });
 }
-exports.SubmitHistory=function(token, history) {
+exports.SubmitHistory=function(token, history, endpoint) {
     request.post(conf.server.masterEndPoint+"/gm/persistGameHistory", {form: {
         token: token,
         percentage: history.bestPercentage,
         time: history.timeLives,
         kill: history.numbersKill,
         secret: conf.server.masterSecret,
+        endpoint: endpoint,
     }}, function(err) {
         if (err) console.error(err);
     });
