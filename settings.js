@@ -25,7 +25,7 @@ module.exports={
 
     server: {
         // the public hostname, useful for both gameserver and master
-        hostname: "ec2-107-23-86-162.compute-1.amazonaws.com",
+        hostname: "637.levy.at",
 
         // will be used only for gameserver, indicating where's the master
         masterEndPoint: "http://637.levy.at:4000",
@@ -56,5 +56,9 @@ module.exports={
         ["#009688", "#80cbc4", "#00796b", "#004d40", "#fff"],   // teal
         ["#cddc39", "#e6ee9c", "#afb42b", "#827717", "#000"],   // lime
         ["#ff5722", "#ffab91", "#e64a19", "#bf360c", "#fff"],   // deep oriange
+        ["#8BC34A", "#C5E1A5", "#689F38", "#33691E", "#000"],   // light green
+        ["#FFC107", "#FFE082", "#FFA000", "#FF6F00", "#000"],   // amber
+        ["#795548", "#BCAAA4", "#5D4037", "#3E2723", "#fff"],   // brown
+        ["#9E9E9E", "#EEEEEE", "#616161", "#212121", "#000"],   // grey
     ],
 };
