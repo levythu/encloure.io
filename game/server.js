@@ -86,7 +86,7 @@ function NewServer(callback, gameConf, playerConf) {
                     if ("username" in ret) {
                         succ({
                             nick: ret.username,
-                        });
+                        }, obj.token);
                     } else {
                         fail();
                     }
@@ -94,7 +94,7 @@ function NewServer(callback, gameConf, playerConf) {
             } else {
                 succ({
                     nick: obj.token,
-                });
+                }, "NOT_A_TOKEN");
             }
         } catch (e) {
             fail();
@@ -107,9 +107,10 @@ function NewServer(callback, gameConf, playerConf) {
         watchDog=setInterval(checkForNoUser, conf.game.GraceTime);
         callback(server.endpoint, server);
     });
+    server.tokenMap={};
     wss.on('connection', function(ws) {
         ws.once("message", function(msg) {
-            waitForValidation(msg, function(profile) {
+            waitForValidation(msg, function(profile, token) {
                 var thisCount=""+(count++);
                 console.log("Client #"+thisCount+" connects.");
 
@@ -123,6 +124,8 @@ function NewServer(callback, gameConf, playerConf) {
                     },
                 };
                 clients[thisCount]=client;
+                if (token!="NOT_A_TOKEN")
+                server.tokenMap[thisCount]=token;
 
                 ws.on("message", function(msg) {
                     // console.log(msg);

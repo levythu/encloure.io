@@ -5,7 +5,7 @@ module.exports={
         FPS:        40,
         RPS:        6,
         RPSLag:     1,      // the lag between client and server, typically the slowest speed
-        GraceTime:  10000,  // the time (in ms) for an empty room to exist before killing itself
+        GraceTime:  120000,  // the time (in ms) for an empty room to exist before killing itself
 
         defaultMap: {
             MapSize:        [80, 80], // default map size
