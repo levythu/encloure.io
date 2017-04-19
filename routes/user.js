@@ -182,8 +182,7 @@ router.get('/getroom', function(req, res) {
         res.redirect('./login');
         return;
     }
-    var query = req._parsedOriginalUrl.query;
-    var roomId = query.split("=")[1];
+    var roomId = req.query.roomId;
 
     if (req.session.author in loggedinUsers) {
         db.getRoomWithId(roomId, function(err, doc) {

@@ -43,9 +43,9 @@ router.post('/unregister', function(req, res) {
 // TODO: refractor /getserver and /createroom
 router.get('/getserver', function(req, res) {
     mutex.Lock(function() {
-        db.getRoom(function(err, room){
+        db.getAvailableRooms(function(err, rooms){
             // Either no room or all rooms are full
-            if (room == null) {
+            if (rooms.length == 0 || 'forcecreate' in req.query) {
                 // create a new room
                 db.getServer(function(err, servers){
                     if (servers.length == 0) {
@@ -88,7 +88,7 @@ router.get('/getserver', function(req, res) {
             } else {
                 // assign this room to user
                 mutex.Unlock();
-                res.send(room.gameEndpoint);
+                res.send(rooms[Math.floor(Math.random()*rooms.length)].gameEndpoint);
                 return;
             }
 

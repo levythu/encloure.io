@@ -80,11 +80,11 @@ exports.updatePlayerNum = function(gameEndpoint, abs) {
     }, function (){});
 }
 
-exports.getRoom = function(callback) {
-    db.collection('rooms').findOne(
-        {$where: "this.activePlayers < this.maxPlayers"}, 
-        callback
-    );
+exports.getAvailableRooms = function(callback) {
+    db.collection('rooms').find(
+    {
+        $where: "this.activePlayers < this.maxPlayers"
+    }, callback);
 }
 
 exports.getRoomWithId = function(roomId, callback) {
@@ -111,13 +111,13 @@ exports.getMapWithName = function(name, callback){
 exports.getServer = function(callback) {
     db.collection('gameServers').aggregate(
         [
-          {
-             $project: {
-                endpoint: 1,
-                token: 1,
-                numberOfRooms: { $size: "$roomIds" }
-             }
-          }
+            {
+                 $project: {
+                    endpoint: 1,
+                    token: 1,
+                    numberOfRooms: { $size: "$roomIds" }
+                 }
+            }
         ]
     ).sort({numberOfRooms:1}, callback);
 }
