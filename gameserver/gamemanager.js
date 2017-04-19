@@ -24,7 +24,7 @@ exports.UpdatePlayer=function(endpoint, playerCount, delta) {
     });
 }
 exports.SubmitHistory=function(token, history) {
-    request.post(conf.server.masterEndPoint+"/gm/updatePlayerNum", {form: {
+    request.post(conf.server.masterEndPoint+"/gm/persistGameHistory", {form: {
         token: token,
         percentage: history.bestPercentage,
         time: history.timeLives,
