@@ -3,7 +3,7 @@ var conf=require("../settings");
 var url = conf.database.url;
 
 var mongojs = require('mongojs');
-var db = mongojs(url, ['gameServers', 'rooms', 'users']);
+var db = mongojs(url, ['gameServers', 'rooms', 'users', 'gameHistory', 'maps']);
 
 exports.insertDoc = function(collectionName, doc) {
     db.collection(collectionName).insert(doc, function(){});
@@ -98,6 +98,12 @@ exports.getRoomWithId = function(roomId, callback) {
     );
 }
 
+exports.getMapWithEndpoint = function(endpoint, callback) {
+  db.collection('rooms').findOne({gameEndpoint:endpoint}, function(err, doc){
+    callback(doc.map.name);
+  });
+}
+
 exports.getAllRooms = function(callback) {
     db.collection('rooms').find(callback);
 }
@@ -109,6 +115,10 @@ exports.getAllMaps = function(callback) {
 exports.getMapWithName = function(name, callback){
     db.collection('maps').findOne(
         {name: name}, callback);
+}
+
+exports.getHighScores = function(mapname, callback) {
+    db.collection('gameHistory').find({'map':mapname}).sort({percentage:-1}).limit(3)
 }
 
 // TODO sort with activePlayers or better sorting

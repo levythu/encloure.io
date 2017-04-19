@@ -138,12 +138,14 @@ router.post('/persistGameHistory', function(req,res) {
         email : user.tokens[req.body.token].email,
         percentage : req.body.percentage,
         kill : req.body.kill,
+        map : req.body.map,
         time : req.body.time,
       });
     } else {
       res.status(403).send("Invalid user token.");
     }
     mutex.Unlock();
+    res.send("ok.");
     return;
   });
 });
