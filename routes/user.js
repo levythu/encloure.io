@@ -349,25 +349,12 @@ router.get('/profile', function(req, res) {
         return;
     }
     if (req.session.author in loggedinUsers) {
-      db.getAllMaps(function(err, docs) {
-          if (docs == null) {
-              res.render('profile');
-              return;
-          }
-
-          maps = [];
-          for (i in docs) {
-              maps.push(docs[i].displayName);
-          }
-          var username = loggedinUsers[req.session.author].username;
-          res.render('profile', {
-            username: username,
-            email: req.session.author,
-            maps: maps,
-          });
-          return;
-      });
-      return;
+        var username = loggedinUsers[req.session.author].username;
+        res.render('profile', {
+          username: username,
+          email: req.session.author,
+        });
+        return;
     } else {
         delete loggedinUsers[req.session.author];
         req.session.author = undefined;
@@ -460,7 +447,17 @@ router.get('/getLeaderboard', function(req, res) {
         },{
             name: "harl",
             number: "99.7%"
-        }]
+        }],
+        survivor: [{
+            name: "harlen",
+            number: "99:99"
+        },{
+            name: "harle",
+            number: "98:98"
+        },{
+            name: "harl",
+            number: "97:97"
+        }],
     });
 });
 
@@ -470,29 +467,24 @@ router.get('/getPersonalBests', function(req, res) {
         res.redirect('./login');
         return;
     }
-    console.log(req.query.map);
-    res.send({
-        killer: [{
+    var email = loggedinUsers[req.session.author].email;
+    console.log(email);
+    res.send([{
             name: "harlen",
-            number: 999
+            number: 999,
+            percentage: "12%",
+            time: "12:23",
         },{
             name: "harle",
-            number: 998
+            number: 998,
+            percentage: "12%",
+            time: "12:23",
         },{
             name: "harl",
-            number: 997
-        }],
-        enclosure: [{
-            name: "harlen",
-            number: "99.9%"
-        },{
-            name: "harle",
-            number: "99.8%"
-        },{
-            name: "harl",
-            number: "99.7%"
-        }]
-    });
+            percentage: "12%",
+            number: 997,
+            time: "12:23",
+        }]);
 });
 
 // TODO

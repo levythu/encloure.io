@@ -46,6 +46,17 @@
                             <tbody id="enclosure">
                             </tbody>
                         </table>
+                        <h3 style="text-align: center; margin-top:40px;">Lucky Survivors</h3>
+                        <table class="table hoverTable">
+                            <thead class="blueHead">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Survived Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sur">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -63,8 +74,10 @@
                     }, function(data) {
                         var enc = $("#enclosure");
                         var killer = $("#kill");
+                        var sur = $("#sur");
                         enc.empty();
                         killer.empty();
+                        sur.empty();
                         for (var i in data.killer) {
                             var tr = $("<tr>");
                             var td = $("<td>").text(data.killer[i].name);
@@ -80,6 +93,14 @@
                             td = $("<td>").text(data.enclosure[i].number);
                             tr.append(td);
                             enc.append(tr);
+                        }
+                        for (var i in data.survivor) {
+                          var tr = $("<tr>");
+                          var td = $("<td>").text(data.survivor[i].name);
+                          tr.append(td);
+                          td = $("<td>").text(data.survivor[i].number);
+                          tr.append(td);
+                          sur.append(tr);
                         }
                         $("#hidden").removeAttr("style");
                         $(".mybutton").removeClass("activebutton");
