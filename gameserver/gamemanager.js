@@ -23,6 +23,17 @@ exports.UpdatePlayer=function(endpoint, playerCount, delta) {
         if (err) console.error(err);
     });
 }
+exports.SubmitHistory=function(token, history) {
+    request.post(conf.server.masterEndPoint+"/gm/updatePlayerNum", {form: {
+        token: token,
+        percentage: history.bestPercentage,
+        time: history.timeLives,
+        kill: history.numbersKill,
+        secret: conf.server.masterSecret,
+    }}, function(err) {
+        if (err) console.error(err);
+    });
+}
 
 function disconnectMaster(err) {
     request.post(conf.server.masterEndPoint+"/gm/unregister", {form: {

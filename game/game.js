@@ -269,14 +269,20 @@ function NewGame(server, gameConf, playerConf) {
             prof.lastMoveTime=now;
         }
         for (var i in die) {
+            var his={
+                bestPercentage: player[i].statistics.bestPercentage,
+                numbersKill: player[i].statistics.numbersKill,
+                timeLives: now-player[i].statistics.timeSpawned,
+            }
             server.Send(player[i].id, {
-                statistics: {
-                    bestPercentage: player[i].statistics.bestPercentage,
-                    numbersKill: player[i].statistics.numbersKill,
-                    timeLives: now-player[i].statistics.timeSpawned,
-                }
+                statistics: his,
             });
+
             game.map.DeleteColor(-(-i));
+            if (i in server.tokenMap) {
+                gm.SubmitHistory(server.tokenMap[i], his);
+                delete server.tokenMap[i];
+            }
             freeColors.push(player[i].color);
             delete player[i];
             game.userOnline--;
