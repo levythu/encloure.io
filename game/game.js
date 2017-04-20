@@ -141,7 +141,7 @@ function NewGame(server, gameConf, playerConf) {
                 if (player[id].remainingsprintCD===0) player[id].sprinting=true;
             }
             if (obj.hey) {
-                if (obj.hey.length>10) obj.hey.length=10;
+                if (obj.hey.length>10) obj.hey=obj.hey.substr(0, 10);
                 player[id].hey=obj.hey;
             }
         }
