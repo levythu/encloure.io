@@ -28,6 +28,7 @@
                         <table class="table hoverTable clickable" onclick="expand('kill', 'Cruel Killers', 'Kill Numbers')">
                             <thead class="blueHead">
                                 <tr>
+                                    <th>#</th>
                                     <th>Name</th>
                                     <th>Kill Numbers</th>
                                 </tr>
@@ -39,6 +40,7 @@
                         <table class="table hoverTable clickable" onclick="expand('percentage', 'Greedy Enclosuers', 'Enclosed Area')">
                             <thead class="blueHead">
                                 <tr>
+                                    <th>#</th>
                                     <th>Name</th>
                                     <th>Enclosed Area</th>
                                 </tr>
@@ -50,6 +52,7 @@
                         <table class="table hoverTable clickable" onclick="expand('time', 'Lucky Survivors', 'Survived Time')">
                             <thead class="blueHead">
                                 <tr>
+                                    <th>#</th>
                                     <th>Name</th>
                                     <th>Survived Time</th>
                                 </tr>
@@ -63,6 +66,7 @@
                       <table class="table hoverTable clickable" onclick="show()">
                           <thead class="blueHead">
                               <tr>
+                                  <th>#</th>
                                   <th>Name</th>
                                   <th id="type">Enclosed Area</th>
                               </tr>
@@ -93,6 +97,12 @@
                         sur.empty();
                         for (var i in data.killer) {
                             var tr = $("<tr>");
+                            var t = parseInt(i) + 1;
+                            if (data.killer[i].name === "N/A") {
+                              t = "N/A";
+                            }
+                            var td = $("<td>").text(t);
+                            tr.append(td);
                             var td = $("<td>").text(data.killer[i].name);
                             tr.append(td);
                             td = $("<td>").text(data.killer[i].number);
@@ -101,6 +111,12 @@
                         }
                         for (var i in data.enclosure) {
                             var tr = $("<tr>");
+                            var t = parseInt(i) + 1;
+                            if (data.enclosure[i].name === "N/A") {
+                              t = "N/A";
+                            }
+                            var td = $("<td>").text(t);
+                            tr.append(td);
                             var td = $("<td>").text(data.enclosure[i].name);
                             tr.append(td);
                             td = $("<td>").text(data.enclosure[i].number);
@@ -109,6 +125,12 @@
                         }
                         for (var i in data.survivor) {
                           var tr = $("<tr>");
+                          var t = parseInt(i) + 1;
+                          if (data.survivor[i].name === "N/A") {
+                            t = "N/A";
+                          }
+                          var td = $("<td>").text(t);
+                          tr.append(td);
                           var td = $("<td>").text(data.survivor[i].name);
                           tr.append(td);
                           td = $("<td>").text(data.survivor[i].number);
@@ -138,6 +160,12 @@
                 body.empty();
                 for (var i in data) {
                   var tr = $("<tr>");
+                  var t = parseInt(i) + 1;
+                  if (data[i].name === "N/A") {
+                    t = "N/A";
+                  }
+                  var td = $("<td>").text(t);
+                  tr.append(td);
                   var td = $("<td>").text(data[i].name);
                   tr.append(td);
                   td = $("<td>").text(data[i].number);
