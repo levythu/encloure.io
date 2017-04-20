@@ -157,7 +157,7 @@ exports.getPersonalBests = function(email, callback) {
                         result[i].percentage = Math.floor(items[0].percentage * 1000) / 10 + "%";
                     }
                     if (counter === 3 * maps.length) {
-                            callback(result);
+                        callback(result);
                     }
                 });
                 db.collection('gameHistory').find({
@@ -177,7 +177,7 @@ exports.getPersonalBests = function(email, callback) {
                         result[i].time = msToTime(items[0].time);
                     }
                     if (counter === 3 * maps.length) {
-                            callback(result);
+                        callback(result);
                     }
                 });
                 db.collection('gameHistory').find({
@@ -197,7 +197,7 @@ exports.getPersonalBests = function(email, callback) {
                         result[i].number = items[0].kill;
                     }
                     if (counter === 3 * maps.length) {
-                            callback(result);
+                        callback(result);
                     }
                 });
             })(i);

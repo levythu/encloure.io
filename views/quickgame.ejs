@@ -23,8 +23,8 @@
             <div class="panel-body">
                 <form method="post" action="/quickgame">
                     <label>Your name </label>
-                    <input type="text" class="form-control noborder" maxlength="20" name="name" required/>
-                    <input type="submit" class="btn btn-block mybutton" value="GO ! ! !">
+                    <input type="text" class="form-control noborder" maxlength="20" name="name" id="name" required/>
+                    <input type="submit" onClick='storeName()' class="btn btn-block mybutton" value="GO ! ! !">
                 </form>
             </div>
         </div>
@@ -32,6 +32,14 @@
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="/js/jquery/jquery-1.11.1.min.js"></script>
     <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      if (typeof window.localStorage.enclosureName!== 'undefined') {
+        $('#name').attr("value", window.localStorage.enclosureName);
+      }
+      function storeName() {
+        window.localStorage.enclosureName = $('#name').val();
+      }
+    </script>
 </body>
 
 </html>
