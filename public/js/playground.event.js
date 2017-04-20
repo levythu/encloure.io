@@ -12,6 +12,7 @@ $(function(){
     var KEY_W=87;
     var KEY_E=69;
     var KEY_CTRL=17;
+    var KEY_ESC=27;
 
     var lastTime=0;
     function sendWord(word) {
@@ -42,6 +43,11 @@ $(function(){
         case KEY_ENTER:
             if (window.__isDead===true) {
                 window.location.reload();
+            }
+            break;
+        case KEY_ESC:
+            if (window.__isDead===true) {
+                OutSider.GetBack();
             }
             break;
         case KEY_A:
