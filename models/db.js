@@ -307,6 +307,48 @@ exports.getHighScores = function(mapname, callback) {
     });
 }
 
+exports.getMoreScores = function(mapname, type, callback) {
+    var choose = {};
+    choose[type] = -1;
+    db.collection('gameHistory').find({
+        'map': mapname
+    }).sort(choose).limit(100, function(err, items) {
+        assert.equal(null, err);
+        if (items.length === 0) {
+            var result = [{
+                name: "N/A",
+                number: "N/A"
+            }]
+            callback(result);
+        }
+        var emailList = [];
+        for (var i in items) {
+            emailList.push(items[i].email);
+        }
+        db.collection('users').find({
+            'email': {
+                $in: emailList
+            }
+        }, function(err, names) {
+            assert.equal(null, err);
+            var result = [];
+            for (var i in items) {
+              var num = items[i][type];
+              if (type == 'time') {
+                num = msToTime(items[i][type]);
+              } else if (type === 'percentage') {
+                num = Math.floor(items[i][type] * 1000) / 10 + "%"
+              }
+                result.push({
+                    name: names.find(x => x.email == items[i].email).username,
+                    number: num,
+                })
+            }
+            callback(result);
+        })
+    })
+}
+
 // TODO sort with activePlayers or better sorting
 exports.getServer = function(callback) {
     db.collection('gameServers').aggregate(

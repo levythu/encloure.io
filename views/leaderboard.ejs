@@ -25,7 +25,7 @@
                 <div class="panel-body">
                     <div id="hidden" style="visibility:hidden;">
                         <h3 style="text-align: center;">Cruel Killers</h3>
-                        <table class="table hoverTable">
+                        <table class="table hoverTable clickable" onclick="expand('kill', 'Cruel Killers', 'Kill Numbers')">
                             <thead class="blueHead">
                                 <tr>
                                     <th>Name</th>
@@ -36,7 +36,7 @@
                             </tbody>
                         </table>
                         <h3 style="text-align: center; margin-top:40px;">Greedy Enclosuers</h3>
-                        <table class="table hoverTable">
+                        <table class="table hoverTable clickable" onclick="expand('percentage', 'Greedy Enclosuers', 'Enclosed Area')">
                             <thead class="blueHead">
                                 <tr>
                                     <th>Name</th>
@@ -47,7 +47,7 @@
                             </tbody>
                         </table>
                         <h3 style="text-align: center; margin-top:40px;">Lucky Survivors</h3>
-                        <table class="table hoverTable">
+                        <table class="table hoverTable clickable" onclick="expand('time', 'Lucky Survivors', 'Survived Time')">
                             <thead class="blueHead">
                                 <tr>
                                     <th>Name</th>
@@ -57,6 +57,19 @@
                             <tbody id="sur">
                             </tbody>
                         </table>
+                    </div>
+                    <div id="expand"  style="visibility:hidden;">
+                      <h3 id="name"style="text-align: center;">Greedy Enclosuers</h3>
+                      <table class="table hoverTable clickable" onclick="show()">
+                          <thead class="blueHead">
+                              <tr>
+                                  <th>Name</th>
+                                  <th id="type">Enclosed Area</th>
+                              </tr>
+                          </thead>
+                          <tbody id="body">
+                          </tbody>
+                      </table>
                     </div>
                 </div>
             </div>
@@ -109,6 +122,35 @@
                 });
                 $("#firstmap").click();
             });
+            function expand(type, tag, th) {
+              var map = $(".activebutton").text();
+              var that = this;
+              $.get("/user/getMoreScores", {
+                map: map,
+                type:type,
+              }, function(data) {
+                console.log(data);
+                $("#hidden").hide();
+                var expand = $("#expand");
+                $("#name").text(tag);
+                $("#type").text(th);
+                var body = $("#body");
+                body.empty();
+                for (var i in data) {
+                  var tr = $("<tr>");
+                  var td = $("<td>").text(data[i].name);
+                  tr.append(td);
+                  td = $("<td>").text(data[i].number);
+                  tr.append(td);
+                  body.append(tr);
+                }
+                expand.removeAttr("style");
+              });
+            }
+            function show() {
+              $("#hidden").show();
+              $("#expand").hide();
+            }
         </script>
     </body>
 

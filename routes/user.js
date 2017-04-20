@@ -401,7 +401,6 @@ router.get('/leaderboard', function(req, res) {
               res.render('leaderboard');
               return;
           }
-
           maps = [];
           for (i in docs) {
               maps.push(docs[i].displayName);
@@ -429,17 +428,31 @@ router.get('/getLeaderboard', function(req, res) {
       db.getHighScores(req.query.map.toLowerCase().replace(" ", "_"), function(highScore) {
         res.send(highScore);
       });
-
     } else {
         delete loggedinUsers[req.session.author];
         req.session.author = undefined;
         res.redirect('/error');
         return;
     }
-
 });
 
-//TODO
+router.get('/getMoreScores', function(req, res) {
+    if (req.session.author == undefined) {
+        res.redirect('./login');
+        return;
+    }
+    if (req.session.author in loggedinUsers) {
+      db.getMoreScores(req.query.map.toLowerCase().replace(" ", "_"), req.query.type, function(data) {
+        res.send(data);
+      });
+    } else {
+        delete loggedinUsers[req.session.author];
+        req.session.author = undefined;
+        res.redirect('/error');
+        return;
+    }
+});
+
 router.get('/getPersonalBests', function(req, res) {
     if (req.session.author == undefined) {
         res.redirect('./login');
@@ -459,22 +472,6 @@ router.get('/getPersonalBests', function(req, res) {
         res.redirect('/error');
         return;
     }
-    // res.send([{
-    //         name: "harlen",
-    //         number: 999,
-    //         percentage: "12%",
-    //         time: "12:23",
-    //     },{
-    //         name: "harle",
-    //         number: 998,
-    //         percentage: "12%",
-    //         time: "12:23",
-    //     },{
-    //         name: "harl",
-    //         percentage: "12%",
-    //         number: 997,
-    //         time: "12:23",
-    //     }]);
 });
 
 // TODO
