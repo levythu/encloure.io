@@ -420,7 +420,6 @@ router.get('/leaderboard', function(req, res) {
   }
 });
 
-//TODO
 router.get('/getLeaderboard', function(req, res) {
     if (req.session.author == undefined) {
         res.redirect('./login');
@@ -446,24 +445,36 @@ router.get('/getPersonalBests', function(req, res) {
         res.redirect('./login');
         return;
     }
-    var email = loggedinUsers[req.session.author].email;
-    console.log(email);
-    res.send([{
-            name: "harlen",
-            number: 999,
-            percentage: "12%",
-            time: "12:23",
-        },{
-            name: "harle",
-            number: 998,
-            percentage: "12%",
-            time: "12:23",
-        },{
-            name: "harl",
-            percentage: "12%",
-            number: 997,
-            time: "12:23",
-        }]);
+    if (req.session.author in loggedinUsers) {
+      var email = loggedinUsers[req.session.author].email;
+      console.log(email);
+      db.getPersonalBests(email, function(result){
+        console.log(result);
+        res.send(result);
+      });
+      return;
+    } else {
+        delete loggedinUsers[req.session.author];
+        req.session.author = undefined;
+        res.redirect('/error');
+        return;
+    }
+    // res.send([{
+    //         name: "harlen",
+    //         number: 999,
+    //         percentage: "12%",
+    //         time: "12:23",
+    //     },{
+    //         name: "harle",
+    //         number: 998,
+    //         percentage: "12%",
+    //         time: "12:23",
+    //     },{
+    //         name: "harl",
+    //         percentage: "12%",
+    //         number: 997,
+    //         time: "12:23",
+    //     }]);
 });
 
 // TODO

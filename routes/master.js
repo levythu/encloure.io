@@ -137,10 +137,10 @@ router.post('/persistGameHistory', function(req,res) {
       db.getMapWithEndpoint(req.body.endpoint, function(mapname) {
         db.persistGameHistory({
           email : user.tokens[req.body.token].email,
-          percentage : req.body.percentage,
-          kill : req.body.kill,
+          percentage : -(-req.body.percentage),
+          kill : -(-req.body.kill),
           map : mapname,
-          time : req.body.time,
+          time : -(-req.body.time),
         });
       });
     } else {

@@ -126,6 +126,85 @@ exports.getMapWithName = function(name, callback) {
     }, callback);
 }
 
+exports.getPersonalBests = function(email, callback) {
+    db.collection('maps').find(function(err, maps) {
+        assert.equal(null, err);
+        var result = [];
+        var counter = 0;
+        for (var i in maps) {
+            var item = {
+                name: maps[i].name,
+                number: 999,
+                percentage: "12%",
+                time: "12:23",
+            };
+            result.push(item);
+            (function(i) {
+                db.collection('gameHistory').find({
+                    $and: [{
+                        email: email
+                    }, {
+                        map: maps[i].name
+                    }]
+                }).sort({
+                    percentage: -1
+                }).limit(1, function(err, items) {
+                    assert.equal(null, err);
+                    counter += 1;
+                    if (items.length === 0) {
+                        result[i].percentage = "N/A";
+                    } else {
+                        result[i].percentage = Math.floor(items[0].percentage * 1000) / 10 + "%";
+                    }
+                    if (counter === 3 * maps.length) {
+                            callback(result);
+                    }
+                });
+                db.collection('gameHistory').find({
+                    $and: [{
+                        email: email
+                    }, {
+                        map: maps[i].name
+                    }]
+                }).sort({
+                    time: -1
+                }).limit(1, function(err, items) {
+                    assert.equal(null, err);
+                    counter += 1;
+                    if (items.length === 0) {
+                        result[i].time = "N/A";
+                    } else {
+                        result[i].time = msToTime(items[0].time);
+                    }
+                    if (counter === 3 * maps.length) {
+                            callback(result);
+                    }
+                });
+                db.collection('gameHistory').find({
+                    $and: [{
+                        email: email
+                    }, {
+                        map: maps[i].name
+                    }]
+                }).sort({
+                    kill: -1
+                }).limit(1, function(err, items) {
+                    assert.equal(null, err);
+                    counter += 1;
+                    if (items.length === 0) {
+                        result[i].number = "N/A";
+                    } else {
+                        result[i].number = items[0].kill;
+                    }
+                    if (counter === 3 * maps.length) {
+                            callback(result);
+                    }
+                });
+            })(i);
+        }
+    });
+}
+
 exports.getHighScores = function(mapname, callback) {
     var killer = [];
     var enclosure = [];
@@ -167,22 +246,22 @@ exports.getHighScores = function(mapname, callback) {
                 })
             }
             if (highScore.killer.length === 0) {
-              highScore.killer.push({
-                  name: "N/A",
-                  number: "N/A"
-              })
+                highScore.killer.push({
+                    name: "N/A",
+                    number: "N/A"
+                })
             }
             if (highScore.survivor.length === 0) {
-              highScore.survivor.push({
-                  name: "N/A",
-                  number: "N/A"
-              })
+                highScore.survivor.push({
+                    name: "N/A",
+                    number: "N/A"
+                })
             }
             if (highScore.enclosure.length === 0) {
-              highScore.enclosure.push({
-                  name: "N/A",
-                  number: "N/A"
-              })
+                highScore.enclosure.push({
+                    name: "N/A",
+                    number: "N/A"
+                })
             }
             callback(highScore);
         });
@@ -254,8 +333,8 @@ function msToTime(s) {
     var mins = s % 60;
     var hrs = (s - mins) / 60;
 
-    var ret=(mins<10?"0"+mins:mins) + ':' + (secs<10?"0"+secs:secs);
-    if (hrs>0) ret=hrs + ':' +ret;
+    var ret = (mins < 10 ? "0" + mins : mins) + ':' + (secs < 10 ? "0" + secs : secs);
+    if (hrs > 0) ret = hrs + ':' + ret;
 
     return ret
 }
