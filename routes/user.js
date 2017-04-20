@@ -426,39 +426,18 @@ router.get('/getLeaderboard', function(req, res) {
         res.redirect('./login');
         return;
     }
-    console.log(req.query.map);
-    res.send({
-        killer: [{
-            name: "harlen",
-            number: 999
-        },{
-            name: "harle",
-            number: 998
-        },{
-            name: "harl",
-            number: 997
-        }],
-        enclosure: [{
-            name: "harlen",
-            number: "99.9%"
-        },{
-            name: "harle",
-            number: "99.8%"
-        },{
-            name: "harl",
-            number: "99.7%"
-        }],
-        survivor: [{
-            name: "harlen",
-            number: "99:99"
-        },{
-            name: "harle",
-            number: "98:98"
-        },{
-            name: "harl",
-            number: "97:97"
-        }],
-    });
+    if (req.session.author in loggedinUsers) {
+      db.getHighScores(req.query.map.toLowerCase().replace(" ", "_"), function(highScore) {
+        res.send(highScore);
+      });
+
+    } else {
+        delete loggedinUsers[req.session.author];
+        req.session.author = undefined;
+        res.redirect('/error');
+        return;
+    }
+
 });
 
 //TODO

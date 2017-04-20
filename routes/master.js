@@ -134,12 +134,14 @@ router.post('/persistGameHistory', function(req,res) {
     }
     // verify user
     if (req.body.token in user.tokens) {
-      db.persistGameHistory({
-        email : user.tokens[req.body.token].email,
-        percentage : req.body.percentage,
-        kill : req.body.kill,
-        map : req.body.map,
-        time : req.body.time,
+      db.getMapWithEndpoint(req.body.endpoint, function(mapname) {
+        db.persistGameHistory({
+          email : user.tokens[req.body.token].email,
+          percentage : req.body.percentage,
+          kill : req.body.kill,
+          map : mapname,
+          time : req.body.time,
+        });
       });
     } else {
       res.status(403).send("Invalid user token.");
