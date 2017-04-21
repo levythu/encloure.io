@@ -58,11 +58,33 @@
         return true;
     };
 
+    function GetNewWarppedExmap(expTimeInMS, checkTimeInMS) {
+        var original=new Exmap(expTimeInMS, checkTimeInMS);
+        return new Proxy(original, {
+            get: function(target, key) {
+                return target.Get(key);
+            },
+            set: function(target, key, value, receiver) {
+                target.Set(key, value);
+                return true;
+            },
+            deleteProperty: function(target, key) {
+                target.Set(key, undefined);
+                return true;
+            },
+            has: function(target, key) {
+                return target.Has(key);
+            },
+        });
+    }
+
     if ( typeof module !== 'undefined' ) {
-        module.exports=Exmap;
+        module.exports.Exmap=Exmap;
+        module.exports.NewExmap=GetNewWarppedExmap;
     }
     if (typeof window !== 'undefined') {
         if (!("_extension" in window)) window._extension={};
         window._extension.Exmap=Exmap;
+        window._extension.NewExmap=GetNewWarppedExmap;
     }
 })();
