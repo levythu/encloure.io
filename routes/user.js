@@ -12,7 +12,7 @@ var conf = require("../settings");
 var crypto = require('crypto');
 var validator = require('validator');
 
-var tokens = {}
+var tokens = require("../utils/expireMap").NewExmap(3600000);
 
 var loggedinUsers = {}
 
