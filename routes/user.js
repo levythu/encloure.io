@@ -265,6 +265,18 @@ router.post('/register', function(req, res) {
                 errors.push('The email is not valid.');
             }
 
+            if (req.body.email.length > 50){
+                errors.push('The email should be shorter than 50 characters.');
+            }
+
+            if (req.body.username.length > 20){
+                errors.push('The username should be shorter than 20 characters.');
+            }
+
+            if (req.body.password1.length <= 8 || req.body.password1.length > 20){
+                errors.push('The password should be 8 - 20 characters.');
+            }
+
             if (req.body.password1 !== req.body.password2) {
                 errors.push('The passwords do not match.');
             }
@@ -368,7 +380,14 @@ router.post('/profile', function(req, res) {
         res.redirect('./login');
         return;
     }
+    if (!req.body.username){
+        res.redirect('./profile');
+        return;
+    }
     if (req.session.author in loggedinUsers) {
+        if (req.body.username > 20){
+            req.body.username.substring(0, 20);
+        }
         userdb.updateAccount(req.session.author,
             req.body.username,
             function(err, doc, lastErrorObject) {
