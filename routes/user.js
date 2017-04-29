@@ -273,7 +273,7 @@ router.post('/register', function(req, res) {
                 errors.push('The username should be shorter than 20 characters.');
             }
 
-            if (req.body.password1.length <= 8 || req.body.password1.length > 20){
+            if (req.body.password1.length < 8 || req.body.password1.length > 20){
                 errors.push('The password should be 8 - 20 characters.');
             }
 
@@ -385,11 +385,12 @@ router.post('/profile', function(req, res) {
         return;
     }
     if (req.session.author in loggedinUsers) {
-        if (req.body.username > 20){
-            req.body.username.substring(0, 20);
+        var username = req.body.username;
+        if (username.length > 20){
+            username = username.substring(0, 20);
         }
         userdb.updateAccount(req.session.author,
-            req.body.username,
+            username,
             function(err, doc, lastErrorObject) {
 
                 loggedinUsers[req.session.author].username = doc.username;
